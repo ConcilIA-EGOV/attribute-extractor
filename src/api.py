@@ -12,7 +12,7 @@ Parametros
 
 import openai
 import os
-from tiktoken import TokenCounter
+import tiktoken
 from dotenv import load_dotenv
 
 
@@ -20,7 +20,7 @@ def num_tokens_from_string(string: str, encoding_name="cl100k_base") -> int:
     """Returns the number of tokens in a text string."""
     # Chamada:
     # num_tokens_from_string("tiktoken is great!", "cl100k_base")
-    encoding = num_tokens_from_string.get_encoding(encoding_name)
+    encoding = tiktoken.get_encoding(encoding_name)
     num_tokens = len(encoding.encode(string))
 
     return num_tokens
@@ -33,12 +33,12 @@ def prompt(prompt, api_key, model="text-davinci-003", temperature=0.7):
     openai.api_key = api_key
 
     # Count tokens in the prompt
-    prompt_tokens = num_tokens_from_string(prompt).total
+    prompt_tokens = num_tokens_from_string(prompt)
     print(f"Tokens in prompt: {prompt_tokens}")
 
     # Generate a response using the OpenAI API
-    response = openai.Completion.create(
-        engine=model,
+    response = openai.completions.create(
+        model=model,
         prompt=prompt,
         temperature=temperature,
         max_tokens=500,  # You can adjust this based on your desired response length
@@ -46,22 +46,27 @@ def prompt(prompt, api_key, model="text-davinci-003", temperature=0.7):
 
     # Extract and count tokens in the generated text from the API response
     generated_text = response.choices[0].text.strip()
-    generated_tokens = num_tokens_from_string(generated_text).total
+    generated_tokens = num_tokens_from_string(generated_text)
     print(f"Tokens in generated text: {generated_tokens}")
 
     return generated_text, prompt_tokens, generated_tokens
 
 
 def main():
+    print("Loading .env")
     load_dotenv()
     # Access the API key using the key name from the .env file
     API_KEY_OPENAI= os.getenv("OPENAI_API_KEY")
 
-    # Example usage:
-    prompt_example = "Translate the following English text to French: 'Hello, how are you?'"
+    while True:
+        # Example usage:
+        prompt_example = input("Insira o prompt:")
 
-    response_example, prompt_tokens, output_tokens = prompt(prompt_example, API_KEY_OPENAI)
+        response_example, prompt_tokens, output_tokens = prompt(prompt_example, API_KEY_OPENAI)
 
-    print("Prompt:", prompt_example)
-    print("Response:", response_example)
-    print("Total tokens:", prompt_tokens+output_tokens) 
+        print("Prompt:", prompt_example)
+        print("Response:", response_example)
+        print("Total tokens:", prompt_tokens+output_tokens) 
+
+if __name__ == "__main__":
+    main()
