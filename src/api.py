@@ -15,12 +15,17 @@ import os
 from tiktoken import TokenCounter
 from dotenv import load_dotenv
 
-def count_tokens(text):
-    # Count tokens using tiktoken
-    token_counter = TokenCounter()
-    token_counter.count(text)
 
-    return token_counter
+def num_tokens_from_string(string: str, encoding_name="cl100k_base") -> int:    
+    """Returns the number of tokens in a text string."""
+    # Chamada:
+    # num_tokens_from_string("tiktoken is great!", "cl100k_base")
+    encoding = num_tokens_from_string.get_encoding(encoding_name)
+    num_tokens = len(encoding.encode(string))
+
+    return num_tokens
+
+
 
 def prompt(prompt, api_key, model="text-davinci-003", temperature=0.7):
     
@@ -28,7 +33,7 @@ def prompt(prompt, api_key, model="text-davinci-003", temperature=0.7):
     openai.api_key = api_key
 
     # Count tokens in the prompt
-    prompt_tokens = count_tokens(prompt).total
+    prompt_tokens = num_tokens_from_string(prompt).total
     print(f"Tokens in prompt: {prompt_tokens}")
 
     # Generate a response using the OpenAI API
@@ -41,7 +46,7 @@ def prompt(prompt, api_key, model="text-davinci-003", temperature=0.7):
 
     # Extract and count tokens in the generated text from the API response
     generated_text = response.choices[0].text.strip()
-    generated_tokens = count_tokens(generated_text).total
+    generated_tokens = num_tokens_from_string(generated_text).total
     print(f"Tokens in generated text: {generated_tokens}")
 
     return generated_text, prompt_tokens, generated_tokens
