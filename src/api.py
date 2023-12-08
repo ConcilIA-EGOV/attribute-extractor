@@ -9,6 +9,7 @@ Parametros
     API_KEY [String, que está no .env]
     Formato do Output [csv, JSON, txt]
 """
+from openai import OpenAI
 
 import openai
 import os
@@ -27,28 +28,26 @@ def num_tokens_from_string(string: str, encoding_name="cl100k_base") -> int:
 
 
 
-def send_prompt(prompt, api_key, model="text-davinci-003", temperature=0.7):
+def send_prompt(prompt, api_key, model="text-davinci-004", temperature=0.7):
     
     # Set your OpenAI API key
     openai.api_key = api_key
-
+    
     # Count tokens in the prompt
     prompt_tokens = num_tokens_from_string(prompt)
-    print(f"Tokens in prompt: {prompt_tokens}")
-
+    
     # Generate a response using the OpenAI API
-    response = openai.completions.create(
+    response =  openai.chat.completions.create(
         model=model,
-        prompt=prompt,
-        temperature=temperature,
-        max_tokens=500,  # You can adjust this based on your desired response length
+        messages=[{"role": "user", "content": prompt}],
+        temperature=temperature
     )
 
     # Extract and count tokens in the generated text from the API response
-    generated_text = response.choices[0].text.strip()
+    
+    generated_text = response.choices[0].message.content.strip()
     generated_tokens = num_tokens_from_string(generated_text)
-    print(f"Tokens in generated text: {generated_tokens}")
-
+    
     return generated_text, prompt_tokens, generated_tokens
 
 

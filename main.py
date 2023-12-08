@@ -5,6 +5,7 @@ Call function to read file and call function to prompt
 from src.file_operations import list_raw_files_in_folder
 from src.api import send_prompt
 
+import random
 import openai
 import os
 import time
@@ -18,7 +19,7 @@ API_KEY_OPENAI= os.getenv("OPENAI_API_KEY")
 def main():
 
     list_files_conjunto1 = list_raw_files_in_folder("data/sentencas/Conjunto1", ext="txt")
-
+    #random.shuffle(list_files_conjunto1)
 
     input_prompt = open("data/prompts/prompt.txt", "r").read()
 
@@ -43,7 +44,10 @@ def main():
         )
         t2 = time.time()
 
-        print("Response:     ", response)
+        print("Response:")
+        print("----------") 
+        print(response.strip().replace("```", ""))
+        print("-----------")
         print("Response time:", round(t2-t1, 2), "seconds")
         print("Input tokens: ", input_tokens)
         print("Output tokens:", output_tokens)
