@@ -27,7 +27,7 @@ def num_tokens_from_string(string: str, encoding_name="cl100k_base") -> int:
 
 
 
-def prompt(prompt, api_key, model="text-davinci-003", temperature=0.7):
+def send_prompt(prompt, api_key, model="text-davinci-003", temperature=0.7):
     
     # Set your OpenAI API key
     openai.api_key = api_key
@@ -62,7 +62,7 @@ def main():
         # Example usage:
         prompt_example = input("Insira o prompt:")
 
-        response_example, prompt_tokens, output_tokens = prompt(prompt_example, API_KEY_OPENAI)
+        response_example, prompt_tokens, output_tokens = send_prompt(prompt_example, API_KEY_OPENAI)
 
         print("Prompt:", prompt_example)
         print("Response:", response_example)
