@@ -30,8 +30,9 @@ def num_tokens_from_string(string: str, encoding_name="cl100k_base") -> int:
 
 def send_prompt(prompt, api_key, model="text-davinci-003", temperature=0.7, retries=3):
     if len(api_key) == 0:
-        time.sleep(random.random() * 1)  # TODO: remove
-        return "No API key specified.", 0, 0
+        raise Exception("API Key is required.")
+    if len(prompt) == 0:
+        raise Exception("Prompt is empty.")
 
     # Set your OpenAI API key
     openai.api_key = api_key
