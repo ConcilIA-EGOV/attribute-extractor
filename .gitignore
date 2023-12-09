@@ -1,0 +1,50 @@
+# Byte-compiled / optimized files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+env/
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Dependency folders
+node_modules/
+jspm_packages/
+
+# Data files
+*.csv
+*.json
+*.xls
+*.xlsx
+
+# OpenAI API keys
+.openai_key
+
+# Other sensitive information
+*.env
+
+# IDE-specific files and folders
+.idea/
+.vscode/
+
+# Logs
+*.log
+
+# Compiled Python files
+*.pyc
+
+# Python packaging artifacts
+dist/
+build/
+*.egg-info/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# System files
+.DS_Store
+Thumbs.db

@@ -17,7 +17,7 @@ import tiktoken
 from dotenv import load_dotenv
 
 
-def num_tokens_from_string(string: str, encoding_name="cl100k_base") -> int:    
+def num_tokens_from_string(string: str, encoding_name="cl100k_base") -> int:
     """Returns the number of tokens in a text string."""
     # Chamada:
     # num_tokens_from_string("tiktoken is great!", "cl100k_base")
@@ -27,27 +27,28 @@ def num_tokens_from_string(string: str, encoding_name="cl100k_base") -> int:
     return num_tokens
 
 
-
 def send_prompt(prompt, api_key, model="text-davinci-004", temperature=0.7):
-    
+    if len(api_key) == 0:
+        return "No API key specified."
+
     # Set your OpenAI API key
     openai.api_key = api_key
-    
+
     # Count tokens in the prompt
     prompt_tokens = num_tokens_from_string(prompt)
-    
+
     # Generate a response using the OpenAI API
-    response =  openai.chat.completions.create(
+    response = openai.chat.completions.create(
         model=model,
         messages=[{"role": "user", "content": prompt}],
         temperature=temperature
     )
 
     # Extract and count tokens in the generated text from the API response
-    
+
     generated_text = response.choices[0].message.content.strip()
     generated_tokens = num_tokens_from_string(generated_text)
-    
+
     return generated_text, prompt_tokens, generated_tokens
 
 
@@ -55,17 +56,18 @@ def main():
     print("Loading .env")
     load_dotenv()
     # Access the API key using the key name from the .env file
-    API_KEY_OPENAI= os.getenv("OPENAI_API_KEY")
+    api_key_openai = os.getenv("OPENAI_API_KEY")
 
     while True:
         # Example usage:
         prompt_example = input("Insira o prompt:")
 
-        response_example, prompt_tokens, output_tokens = send_prompt(prompt_example, API_KEY_OPENAI)
+        response_example, prompt_tokens, output_tokens = send_prompt(prompt_example, api_key_openai)
 
         print("Prompt:", prompt_example)
         print("Response:", response_example)
-        print("Total tokens:", prompt_tokens+output_tokens) 
+        print("Total tokens:", prompt_tokens + output_tokens)
+
 
 if __name__ == "__main__":
     main()
