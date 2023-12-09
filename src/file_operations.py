@@ -5,10 +5,26 @@ import glob
 import pandas as pd
 
 
+def get_set_of_files_path(base_path):
+    folders = [os.path.join(base_path, f) for f in os.listdir(base_path) if os.path.isdir(os.path.join(base_path, f))]
+    if len(folders) > 0:
+        return folders
+    raise Exception("No experiments found")
+
+
+def get_list_of_prompts(prompt_base_path, ext="txt"):
+    list_files = glob.glob(os.path.join(prompt_base_path, "*." + ext))
+    if len(list_files) > 0:
+        return list_files
+    raise Exception("No prompts found")
+
+
 def list_raw_files_in_folder(path_to_folder, ext="txt"):
     # List files
-    list_files_paths = glob.glob(path_to_folder + os.sep + "*." + ext)
-    return sorted(list_files_paths)
+    list_files_paths = glob.glob(os.path.join(path_to_folder, "*." + ext))
+    if len(list_files_paths) > 0:
+        return sorted(list_files_paths)
+    raise Exception("No raw files found")
 
 
 def read_txt_file(target_file, enc="utf-8"):
@@ -20,7 +36,7 @@ def ensure_directory_exists(path):
 
 
 def store_output_results(list_outputs, output_path, base_folder_name, output_type):
-    print("Saving results to " + output_path + "using " + output_type)
+    print("Saving results to " + output_path + " using " + output_type.upper() + " format")
 
     final_output_path = os.path.join(output_path, base_folder_name)
     ensure_directory_exists(final_output_path)
@@ -30,8 +46,14 @@ def store_output_results(list_outputs, output_path, base_folder_name, output_typ
 
     if output_type.lower() == "csv":
         df = pd.DataFrame(list_outputs)
-        df.to_csv(os.path.join(final_output_path, "csv", "output.csv"), index=False)
+        path_to_csv = os.path.join(final_output_path, "csv")
+        ensure_directory_exists(path_to_csv)
+        file_path = os.path.join(path_to_csv, "output.csv")
+
+        df.to_csv(file_path, index=False)
+
     elif output_type.lower() == "log":
+
         raise Exception("Output type 'log' not implemented")
     elif output_type.lower() == "txt":
         # Create a folder just the raw files
@@ -50,4 +72,3 @@ def store_output_results(list_outputs, output_path, base_folder_name, output_typ
         file_path = os.path.join(final_output_path, "csv", "output.csv")
         with open(file_path, 'w') as json_file:
             json.dump(list_outputs, json_file, indent=4)
-

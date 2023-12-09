@@ -1,39 +1,28 @@
 """
 Call function to read file and call function to prompt
 """
-import glob
 import os
 import time
 
-import pandas as pd
 import tqdm
-from dotenv import load_dotenv
 
-from src.api import send_prompt
-from src.file_operations import list_raw_files_in_folder, read_txt_file, store_output_results
+from src.api import send_prompt, get_api_key
+from src.file_operations import list_raw_files_in_folder, read_txt_file, store_output_results, get_set_of_files_path, \
+    get_list_of_prompts
 
-load_dotenv()
-# Access the API key using the key name from the .env file
-API_KEY_OPENAI = os.getenv("OPENAI_API_KEY")
-
-
-def get_set_of_files_path(base_path):
-    folders = [os.path.join(base_path, f) for f in os.listdir(base_path) if os.path.isdir(os.path.join(base_path, f))]
-    return folders
-
-
-def get_list_of_prompts(prompt_base_path):
-    return glob.glob(os.path.join(prompt_base_path, ".txt"))
+PATH_RAW_DOCUMENTS_FOLDERS = "data/sentencas"
+PATH_PROMPTS = "data/prompts"
+PATH_BASE_OUTPUT = "data/resultados"
 
 
 def merge_prompt_and_document(document_text, prompt):
     """
     In this way, we are sure that we follow the same pattern all the time.
     """
-    return prompt + "[" + document_text + "]"
+    return prompt + os.linesep + "[ " + document_text + " ]"
 
 
-def apply_prompt_to_files(target_files_paths, prompt_path, output_path="", verbose=False, output_type="csv"):
+def apply_prompt_to_files(target_files_paths, prompt_path, output_path="", verbose=False, output_types=["csv"]):
     list_outputs = []
 
     for file_path in tqdm.tqdm(target_files_paths):
@@ -53,18 +42,20 @@ def apply_prompt_to_files(target_files_paths, prompt_path, output_path="", verbo
         t1 = time.time()
         response, input_tokens, output_tokens = send_prompt(
             full_prompt,
-            api_key=API_KEY_OPENAI,
+            api_key=get_api_key(),
             model="gpt-4-1106-preview",
             temperature=1.0
         )
         t2 = time.time()
+
+        response = response.replace("```", "").strip()
 
         # Saving info for later output handling (json, csv, etc.)
         file_results["raw_file_path"] = file_path
         file_results["prompt_path"] = prompt_path
         # file_results["raw_text"] = document_text
         file_results["output_text"] = response
-        file_results["response_time"] = t2 - t1
+        file_results["response_time"] = round(t2 - t1, 4)
         file_results["input_tokens"] = input_tokens
         file_results["output_tokens"] = output_tokens
         file_results["total_tokens"] = input_tokens + output_tokens
@@ -79,26 +70,37 @@ def apply_prompt_to_files(target_files_paths, prompt_path, output_path="", verbo
             print(f"Input tokens: {input_tokens}")
             print(f"Output tokens: {output_tokens}")
 
-    prompt_name = prompt_path.split(os.sep)[-1]
-    documents_folder_name = target_files_paths.split(os.sep)[-1].replace(".txt", "")
+    prompt_name = prompt_path.split(os.sep)[-1].replace(".txt", "")
+    documents_folder_name = target_files_paths[0].split(os.sep)[-2]
 
-    base_file_name = "_".join(["experiment", prompt_name, documents_folder_name])
-    store_output_results(list_outputs, output_path, base_file_name, output_type)
+    base_file_name = "_".join(["experiment", prompt_name, documents_folder_name]).replace(" ", "-")
+
+    for output_type in output_types:
+        store_output_results(list_outputs, output_path, base_file_name, output_type)
 
 
-def run_experiments():
-    list_set_files_path = []
-    list_files_conjunto1 = list_raw_files_in_folder("data/sentencas/Conjunto1", ext="txt")
+def run_all_experiments():
+    list_set_of_experiments = get_set_of_files_path(base_path=PATH_RAW_DOCUMENTS_FOLDERS)
+    list_prompts = get_list_of_prompts(prompt_base_path=PATH_PROMPTS)
 
-    list_sets_path = get_set_of_files_path("data/sentencas")
-    for experiment in list_sets_path:
-        print(experiment)
+    # The experiments are the individual folders with raw txt files.
+    for experiment in list_set_of_experiments:
+        print("=" * 50)
+        print("Running experiment:", experiment)
 
-    input_prompt = open("data/prompts/prompt.txt", "r").read()
+        # Apply each available prompt for each experiment
+        for prompt in list_prompts:
+            print("-" * 50)
+            print("Using prompt: ", prompt)
+            raw_files_path = list_raw_files_in_folder(experiment)
+
+            # Apply the prompt
+            print("Applying to files:", len(raw_files_path))
+            apply_prompt_to_files(raw_files_path, prompt, PATH_BASE_OUTPUT, verbose=False, output_types=["txt", "csv"])
 
 
 def main():
-    run_experiments()
+    run_all_experiments()
 
 
 if __name__ == "__main__":
