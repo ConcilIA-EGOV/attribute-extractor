@@ -27,7 +27,7 @@ def num_tokens_from_string(string: str, encoding_name="cl100k_base") -> int:
     return num_tokens
 
 
-def send_prompt(prompt, api_key, model="text-davinci-004", temperature=0.7):
+def send_prompt(prompt, api_key, model="text-davinci-003", temperature=0.7):
     if len(api_key) == 0:
         return "No API key specified."
 
@@ -53,6 +53,9 @@ def send_prompt(prompt, api_key, model="text-davinci-004", temperature=0.7):
 
 
 def main():
+    """
+    A test-bed to check whether the OpenAI API is available.
+    """
     print("Loading .env")
     load_dotenv()
     # Access the API key using the key name from the .env file
@@ -60,7 +63,7 @@ def main():
 
     while True:
         # Example usage:
-        prompt_example = input("Insira o prompt:")
+        prompt_example = input("\n\nInsira o prompt: ")
 
         response_example, prompt_tokens, output_tokens = send_prompt(prompt_example, api_key_openai)
 
