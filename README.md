@@ -15,6 +15,7 @@ pip install -r requirements.txt
 ``
 
 Put the OpenAI API token in the `.env` file in the root folder:
+
 ``
 OPENAI_API_KEY=00000000000
 ``
