@@ -4,16 +4,20 @@
 
 ## Overview
 
-The repository aims at running a series of prompts on OpenAI models to extract information from legal judgments in Portuguese language.
+The repository aims to run a series of prompts on OpenAI models to extract information from legal judgments in the Portuguese language.
 
 ## Installation
 
-To install dependencies run:
+To install dependencies run the following:
 
 ``
 pip install -r requirements.txt
 ``
 
+Put the OpenAI API token in the `.env` file in the root folder:
+``
+OPENAI_API_KEY=00000000000
+``
 
 ## Usage
 
@@ -51,13 +55,6 @@ API calls to the OpenAI API
 
 Overview of the I/O operations on files provided by `file_operations.py`.
 
-## Contributing
-
-Guidelines for contributing to your project, if applicable.
-
-## License
-
-Specify the license under which your project is released.
 
 ## Acknowledgments
 
