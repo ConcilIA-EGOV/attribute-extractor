@@ -21,9 +21,12 @@ def merge_prompt_and_document(document_text, prompt):
     """
     return prompt + os.linesep + "[ " + document_text + " ]"
 
-
-def apply_prompt_to_files(target_files_paths, prompt_path, output_path="", verbose=False, output_types=["csv"]):
+def apply_prompt_to_files(target_files_paths, prompt_path, output_path="", verbose=False, output_types=["csv"], i=1):
     list_outputs = []
+
+    data_base = open("database" + str(i) + ".csv", "w")
+    i += 1
+    data_base.write("Sentença,direito de arrependimento,descumprimento de oferta,extravio definitivo,extravio temporário,intervalo de extravio,violação,cancelamento (sem realocação)/alteração de destino,atraso de voo,intervalo de atraso,culpa exclusiva do consumidor,inoperabilidade do aeroporto,no show,overbooking,assistência da companhia aérea,agência de viagem,hipervulnerabilidade\n")
 
     for file_path in tqdm.tqdm(target_files_paths):
         file_results = {}
@@ -49,6 +52,15 @@ def apply_prompt_to_files(target_files_paths, prompt_path, output_path="", verbo
         t2 = time.time()
 
         response = response.replace("```", "").strip()
+        response_for_db = response.split('\n')
+        arquivo = list(file_path[:-4])
+        arquivo.reverse()
+        limite = arquivo.index('/')
+        temp = arquivo[:limite]
+        temp.reverse()
+        sentenca = "".join(temp) + ','
+        csv_block = sentenca + response_for_db[1] + "\n"
+        data_base.write(csv_block)
 
         # Saving info for later output handling (json, csv, etc.)
         file_results["raw_file_path"] = file_path
@@ -69,6 +81,9 @@ def apply_prompt_to_files(target_files_paths, prompt_path, output_path="", verbo
             print(f"Response time: {round(t2 - t1, 3)} seconds")
             print(f"Input tokens: {input_tokens}")
             print(f"Output tokens: {output_tokens}")
+        
+        time.sleep(4)
+    data_base.close()
 
     prompt_name = prompt_path.split(os.sep)[-1].replace(".txt", "")
     documents_folder_name = target_files_paths[0].split(os.sep)[-2]
@@ -96,7 +111,7 @@ def run_all_experiments():
 
             # Apply the prompt
             print("Applying to files:", len(raw_files_path))
-            apply_prompt_to_files(raw_files_path, prompt, PATH_BASE_OUTPUT, verbose=False, output_types=["txt", "csv"])
+            apply_prompt_to_files(raw_files_path, prompt, PATH_BASE_OUTPUT, verbose=True, output_types=["txt", "csv"], i=1)
 
 
 def main():
@@ -105,5 +120,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# testing local commit
