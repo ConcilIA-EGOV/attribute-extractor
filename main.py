@@ -6,10 +6,10 @@ import time
 
 import tqdm
 
-from config import sentence_repetitions, time_between_requests
+from config import sentence_repetitions, time_between_requests, alternative_save, output_types, verbose
 from src.api import send_prompt, get_api_key
 from src.file_operations import list_raw_files_in_folder, read_txt_file, store_output_results, get_set_of_files_path, \
-    get_list_of_prompts
+    get_list_of_prompts, get_results_path
 
 PATH_RAW_DOCUMENTS_FOLDERS = "data/sentencas"
 PATH_PROMPTS = "data/prompts"
@@ -22,11 +22,13 @@ def merge_prompt_and_document(document_text, prompt):
     """
     return prompt + os.linesep + "[ " + document_text + " ]"
 
-def apply_prompt_to_files(target_files_paths, prompt_path, output_path="", verbose=False, output_types=["csv"], i=1):
-    list_outputs = []
+def apply_prompt_to_files(target_files_paths, prompt_path, output_path=""):
+    if alternative_save:
+        list_outputs = []
 
-    resultados = open("resultados" + str(i) + ".csv", "w")
-    i += 1
+    results_path = get_results_path(target_files_paths, prompt_path, PATH_BASE_OUTPUT)
+
+    resultados = open(results_path + ".csv", "w")
     resultados.write("Sentença,direito de arrependimento,descumprimento de oferta,extravio definitivo,extravio temporário,intervalo de extravio,violação,cancelamento (sem realocação)/alteração de destino,atraso de voo,intervalo de atraso,culpa exclusiva do consumidor,inoperabilidade do aeroporto,no show,overbooking,assistência da companhia aérea,agência de viagem,hipervulnerabilidade\n")
 
     for file_path in tqdm.tqdm(target_files_paths):
@@ -69,16 +71,17 @@ def apply_prompt_to_files(target_files_paths, prompt_path, output_path="", verbo
             # Salvando Resultado
             resultados.write(csv_block)
 
-            # Saving info for later output handling (json, csv, etc.)
-            file_results["raw_file_path"] = file_path
-            file_results["prompt_path"] = prompt_path
-            # file_results["raw_text"] = document_text
-            file_results["output_text"] = response
-            file_results["response_time"] = round(t2 - t1, 4)
-            file_results["input_tokens"] = input_tokens
-            file_results["output_tokens"] = output_tokens
-            file_results["total_tokens"] = input_tokens + output_tokens
-            list_outputs.append(file_results)
+            if alternative_save:
+                # Saving info for later output handling (json, csv, etc.)
+                file_results["raw_file_path"] = file_path
+                file_results["prompt_path"] = prompt_path
+                # file_results["raw_text"] = document_text
+                file_results["output_text"] = response
+                file_results["response_time"] = round(t2 - t1, 4)
+                file_results["input_tokens"] = input_tokens
+                file_results["output_tokens"] = output_tokens
+                file_results["total_tokens"] = input_tokens + output_tokens
+                list_outputs.append(file_results)
 
             if verbose:
                 print("Response:")
@@ -94,13 +97,13 @@ def apply_prompt_to_files(target_files_paths, prompt_path, output_path="", verbo
                 
     resultados.close()
 
-    prompt_name = prompt_path.split(os.sep)[-1].replace(".txt", "")
-    documents_folder_name = target_files_paths[0].split(os.sep)[-2]
+    if alternative_save:
+        prompt_name = prompt_path.split(os.sep)[-1].replace(".txt", "")
+        documents_folder_name = target_files_paths[0].split(os.sep)[-2]
+        base_file_name = "_".join(["experiment", prompt_name, documents_folder_name]).replace(" ", "-")
 
-    base_file_name = "_".join(["experiment", prompt_name, documents_folder_name]).replace(" ", "-")
-
-    for output_type in output_types:
-        store_output_results(list_outputs, output_path, base_file_name, output_type)
+        for output_type in output_types:
+            store_output_results(list_outputs, output_path, base_file_name, output_type)
 
 
 def run_all_experiments():
@@ -120,7 +123,7 @@ def run_all_experiments():
 
             # Apply the prompt
             print("Applying to files:", len(raw_files_path))
-            apply_prompt_to_files(raw_files_path, prompt, PATH_BASE_OUTPUT, verbose=True, output_types=["txt", "csv"], i=1)
+            apply_prompt_to_files(raw_files_path, prompt, PATH_BASE_OUTPUT)
 
 
 def main():

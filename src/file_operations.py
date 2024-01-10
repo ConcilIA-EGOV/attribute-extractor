@@ -4,7 +4,6 @@ import os
 import glob
 import pandas as pd
 
-
 def get_set_of_files_path(base_path):
     folders = [os.path.join(base_path, f) for f in os.listdir(base_path) if os.path.isdir(os.path.join(base_path, f))]
     if len(folders) > 0:
@@ -72,3 +71,19 @@ def store_output_results(list_outputs, output_path, base_folder_name, output_typ
         file_path = os.path.join(final_output_path, "csv", "output.csv")
         with open(file_path, 'w') as json_file:
             json.dump(list_outputs, json_file, indent=4)
+
+
+def get_results_path(target_files_paths, prompt_path, PATH_BASE_OUTPUT):
+    prompt_name = prompt_path.split(os.sep)[-1].replace(".txt", "")
+    documents_folder_name = target_files_paths[0].split(os.sep)[-2]
+
+    base_dir_name = "_".join(["experiment", prompt_name, documents_folder_name]).replace(" ", "-")
+
+    dir_path = os.path.join(PATH_BASE_OUTPUT, base_dir_name, "csv")
+    
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+
+    results_path = os.path.join(dir_path, "resultados")
+
+    return results_path
