@@ -73,6 +73,7 @@ def store_output_results(list_outputs, output_path, base_folder_name, output_typ
             json.dump(list_outputs, json_file, indent=4)
 
 
+# Local onde será salvo o arquivo csv com o resultado das requisições
 def get_results_path(target_files_paths, prompt_path, PATH_BASE_OUTPUT):
     prompt_name = prompt_path.split(os.sep)[-1].replace(".txt", "")
     documents_folder_name = target_files_paths[0].split(os.sep)[-2]
@@ -87,3 +88,28 @@ def get_results_path(target_files_paths, prompt_path, PATH_BASE_OUTPUT):
     results_path = os.path.join(dir_path, "resultados")
 
     return results_path
+
+
+def convert_csv_to_xlsx(results_path):
+    # Caminho do arquivo csv
+    csv_file = results_path + ".csv"
+    
+    # Verificando se o arquivo existe
+    if not os.path.exists(csv_file):
+        print("O arquivo de resultados não foi encontrado")
+        return
+    
+    # Setando diretório do arquivo xlsx
+    base_dir_path = os.sep.join(results_path.split(os.sep)[:-2])
+    xlsx_dir_path = os.path.join(base_dir_path, "xlsx")
+    ensure_directory_exists(xlsx_dir_path)
+
+    # Setando arquivo xlsx
+    xlsx_file = os.path.join(xlsx_dir_path, "resultados.xlsx")
+
+    # Transformando CSV em DataFrame
+    data_frame = pd.read_csv(csv_file)
+
+    # Transformando Data Frame em XLSX
+    data_frame.to_excel(xlsx_file, index=False)
+

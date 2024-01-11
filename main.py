@@ -9,7 +9,7 @@ import tqdm
 from config import sentence_repetitions, time_between_requests, alternative_save, output_types, verbose
 from src.api import send_prompt, get_api_key
 from src.file_operations import list_raw_files_in_folder, read_txt_file, store_output_results, get_set_of_files_path, \
-    get_list_of_prompts, get_results_path
+    get_list_of_prompts, get_results_path, convert_csv_to_xlsx
 
 PATH_RAW_DOCUMENTS_FOLDERS = "data/sentencas"
 PATH_PROMPTS = "data/prompts"
@@ -96,6 +96,9 @@ def apply_prompt_to_files(target_files_paths, prompt_path, output_path=""):
                 time.sleep(time_between_requests)
                 
     resultados.close()
+
+    # Converte csv para xlsx
+    convert_csv_to_xlsx(results_path)
 
     if alternative_save:
         prompt_name = prompt_path.split(os.sep)[-1].replace(".txt", "")
