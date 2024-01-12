@@ -16,7 +16,10 @@ import time
 
 import openai
 import tiktoken
+import sys
 from dotenv import load_dotenv
+sys.path.append('../config.py')
+from config import api_access
 
 
 def num_tokens_from_string(string: str, encoding_name="cl100k_base") -> int:
@@ -43,13 +46,15 @@ def send_prompt(prompt, api_key, model="text-davinci-003", temperature=0.7, retr
 
     for retry in range(retries):
         try:
-            # Generate a response using the OpenAI API
-            # response = openai.chat.completions.create(
-            #     model=model,
-            #     messages=[{"role": "user", "content": prompt}],
-            #     temperature=temperature
-            # )
-            response = mock_response
+            if api_access:
+                # Generate a response using the OpenAI API
+                response = openai.chat.completions.create(
+                    model=model,
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=temperature
+                )
+            else:
+                response = mock_response
             break
         except Exception as e:
             response = None
@@ -60,12 +65,13 @@ def send_prompt(prompt, api_key, model="text-davinci-003", temperature=0.7, retr
     if response is None:
         raise Exception("OpenAI did not respond. Stopping.")
 
-    # Código original com a response da OpenAI
-    # Extract and count tokens in the generated text from the API response
-    # generated_text = response.choices[0].message.content.strip()
+    if api_access:
+        # Extract and count tokens in the generated text from the API response
+        generated_text = response.choices[0].message.content.strip()
+    else:
+        # Response simulada (para desenvolvimento), devido ao não acesso à API
+        generated_text = response['choices'][0]['message']['content'].strip()
 
-    # Response simulada (para desenvolvimento), devido ao não acesso à API
-    generated_text = response['choices'][0]['message']['content'].strip()
     generated_tokens = num_tokens_from_string(generated_text)
 
     return generated_text, prompt_tokens, generated_tokens

@@ -9,11 +9,12 @@ import tqdm
 from config import sentence_repetitions, time_between_requests, alternative_save, output_types, verbose
 from src.api import send_prompt, get_api_key
 from src.file_operations import list_raw_files_in_folder, read_txt_file, store_output_results, get_set_of_files_path, \
-    get_list_of_prompts, get_results_path, convert_csv_to_xlsx
+    get_list_of_prompts, get_results_path, get_log_path, convert_csv_to_xlsx
 
 PATH_RAW_DOCUMENTS_FOLDERS = "data/sentencas"
 PATH_PROMPTS = "data/prompts"
 PATH_BASE_OUTPUT = "data/resultados"
+PATH_LOG = "data/log"
 
 
 def merge_prompt_and_document(document_text, prompt):
@@ -26,8 +27,13 @@ def apply_prompt_to_files(target_files_paths, prompt_path, output_path=""):
     if alternative_save:
         list_outputs = []
 
-    results_path = get_results_path(target_files_paths, prompt_path, PATH_BASE_OUTPUT)
+    # Abrindo arquivo com log das responses
+    log_path = get_log_path(target_files_paths, prompt_path, PATH_LOG)
+    log = open(log_path + ".txt", "w")
+    log.write("Responses\n\n")
 
+    # Abrindo arquivo de resultados
+    results_path = get_results_path(target_files_paths, prompt_path, PATH_BASE_OUTPUT)
     resultados = open(results_path + ".csv", "w")
     resultados.write("Sentença,direito de arrependimento,descumprimento de oferta,extravio definitivo,extravio temporário,intervalo de extravio,violação,cancelamento (sem realocação)/alteração de destino,atraso de voo,intervalo de atraso,culpa exclusiva do consumidor,inoperabilidade do aeroporto,no show,overbooking,assistência da companhia aérea,agência de viagem,hipervulnerabilidade\n")
 
@@ -66,7 +72,23 @@ def apply_prompt_to_files(target_files_paths, prompt_path, output_path=""):
             temp = arquivo[:limite]
             temp.reverse()
             sentenca = "".join(temp) + ','
-            csv_block = sentenca + response_for_db[1] + "\n"
+
+            # Salvando response no arquivo de log
+            log.write("Sentença " + sentenca[:-1] + ":\n")
+            log.write(response + "\n\n")
+            # log.write("Response Time: " + str(round(t2 - t1, 4)) + "\n")
+            # log.write("Input tokens: " + str(input_tokens) + "\n")
+            # log.write("Output tokens: " + str(output_tokens) + "\n")
+            # log.write("Total tokens: " + str(input_tokens + output_tokens) + "\n")
+
+            # Houve casos em que a havia mais de duas linhas na resposta
+            # Sendo a primeira a palavra "csv" ou "plaintext"
+            if (len(response_for_db) == 2):
+                csv_block = sentenca + response_for_db[1] + "\n"
+            elif (len(response_for_db) == 3):
+                csv_block = sentenca + response_for_db[2] + "\n"
+            else:
+                csv_block = sentenca + "response format error" + "\n"
 
             # Salvando Resultado
             resultados.write(csv_block)
@@ -96,6 +118,7 @@ def apply_prompt_to_files(target_files_paths, prompt_path, output_path=""):
                 time.sleep(time_between_requests)
                 
     resultados.close()
+    log.close()
 
     # Converte csv para xlsx
     convert_csv_to_xlsx(results_path)

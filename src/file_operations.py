@@ -89,6 +89,22 @@ def get_results_path(target_files_paths, prompt_path, PATH_BASE_OUTPUT):
 
     return results_path
 
+# Local onde será salvo o log com as responses do experimento
+def get_log_path(target_files_paths, prompt_path, PATH_LOG):
+    prompt_name = prompt_path.split(os.sep)[-1].replace(".txt", "")
+    documents_folder_name = target_files_paths[0].split(os.sep)[-2]
+
+    base_dir_name = "_".join(["experiment", prompt_name, documents_folder_name]).replace(" ", "-")
+
+    dir_path = os.path.join(PATH_LOG, base_dir_name)
+    
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+
+    log_path = os.path.join(dir_path, "log")
+
+    return log_path
+
 
 def convert_csv_to_xlsx(results_path):
     # Caminho do arquivo csv
