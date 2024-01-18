@@ -63,7 +63,7 @@ def send_prompt(prompt, api_key, model="text-davinci-003", temperature=0.7, retr
             time.sleep(60)
 
     if response is None:
-        raise Exception("OpenAI did not respond. Stopping.")
+        raise Exception("OpenAI did not respond.")
 
     if api_access:
         # Extract and count tokens in the generated text from the API response
