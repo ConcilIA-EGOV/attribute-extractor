@@ -81,14 +81,19 @@ def apply_prompt_to_files(target_files_paths, prompt_path, output_path=""):
             # log.write("Output tokens: " + str(output_tokens) + "\n")
             # log.write("Total tokens: " + str(input_tokens + output_tokens) + "\n")
 
-            # Houve casos em que a havia mais de duas linhas na resposta
-            # Sendo a primeira a palavra "csv" ou "plaintext"
-            if (len(response_for_db) == 2):
-                csv_block = sentenca + response_for_db[1] + "\n"
-            elif (len(response_for_db) == 3):
-                csv_block = sentenca + response_for_db[2] + "\n"
-            else:
+            # Pegando a linha com os resultados
+            result_index = None
+            for i, row in enumerate(response_for_db):
+                row_elements = row.split(',')
+                if (len(row_elements) > 3 and all(not element.isdigit() for element in row_elements)):
+                    result_index = i
+                    break
+            
+            if (result_index == None):
                 csv_block = sentenca + "response format error" + "\n"
+            else:
+                csv_block = sentenca + response_for_db[result_index] + "\n"
+
 
             # Salvando Resultado
             resultados.write(csv_block)
