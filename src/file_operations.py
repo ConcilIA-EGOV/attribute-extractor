@@ -80,12 +80,12 @@ def get_results_path(target_files_paths, prompt_path, PATH_BASE_OUTPUT):
 
     base_dir_name = "_".join(["experiment", prompt_name, documents_folder_name]).replace(" ", "-")
 
-    dir_path = os.path.join(PATH_BASE_OUTPUT, base_dir_name, "csv")
+    dir_path = os.path.join(PATH_BASE_OUTPUT, base_dir_name, "sem_formatacao")
     
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
 
-    results_path = os.path.join(dir_path, "resultados")
+    results_path = os.path.join(dir_path, "resultados_sem_formatacao.csv")
 
     return results_path
 
@@ -106,26 +106,34 @@ def get_log_path(target_files_paths, prompt_path, PATH_LOG):
     return log_path
 
 
-def convert_csv_to_xlsx(results_path):
-    # Caminho do arquivo csv
-    csv_file = results_path + ".csv"
-    
+def convert_csv_to_xlsx(origin_csv_path):    
     # Verificando se o arquivo existe
-    if not os.path.exists(csv_file):
+    if not os.path.exists(origin_csv_path):
         print("O arquivo de resultados não foi encontrado")
         return
     
     # Setando diretório do arquivo xlsx
-    base_dir_path = os.sep.join(results_path.split(os.sep)[:-2])
-    xlsx_dir_path = os.path.join(base_dir_path, "xlsx")
-    ensure_directory_exists(xlsx_dir_path)
+    xlsx_dir_path = os.sep.join(origin_csv_path.split(os.sep)[:-1])
 
     # Setando arquivo xlsx
-    xlsx_file = os.path.join(xlsx_dir_path, "resultados.xlsx")
+    xlsx_file = os.path.join(xlsx_dir_path, "resultados_sem_formatacao.xlsx")
 
     # Transformando CSV em DataFrame
-    data_frame = pd.read_csv(csv_file)
+    data_frame = pd.read_csv(origin_csv_path)
 
     # Transformando Data Frame em XLSX
     data_frame.to_excel(xlsx_file, index=False)
 
+
+def get_formatted_results_path(csv_origin_path):
+    # Verificando se o arquivo existe
+    if not os.path.exists(csv_origin_path):
+        print("O arquivo de resultados (sem formatação) não foi encontrado")
+        return
+    
+    # Criação do diretório de arquivos formatados
+    base_dir_path = os.sep.join(csv_origin_path.split(os.sep)[:-2])
+    res_dir_path = os.path.join(base_dir_path, "formatados")
+    ensure_directory_exists(res_dir_path)
+
+    return res_dir_path

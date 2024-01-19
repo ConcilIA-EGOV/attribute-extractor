@@ -9,12 +9,14 @@ import tqdm
 from config import sentence_repetitions, time_between_requests, alternative_save, output_types, verbose
 from src.api import send_prompt, get_api_key
 from src.file_operations import list_raw_files_in_folder, read_txt_file, store_output_results, get_set_of_files_path, \
-    get_list_of_prompts, get_results_path, get_log_path, convert_csv_to_xlsx
+    get_list_of_prompts, get_results_path, get_log_path, convert_csv_to_xlsx, get_formatted_results_path
+from src.time_converter import convert_time_to_numeric
 
 PATH_RAW_DOCUMENTS_FOLDERS = "data/sentencas"
 PATH_PROMPTS = "data/prompts"
 PATH_BASE_OUTPUT = "data/resultados"
 PATH_LOG = "data/log"
+PATH_RESULTS = "resultados"
 
 
 def merge_prompt_and_document(document_text, prompt):
@@ -33,8 +35,8 @@ def apply_prompt_to_files(target_files_paths, prompt_path, output_path=""):
     log.write("Responses\n\n")
 
     # Abrindo arquivo de resultados
-    results_path = get_results_path(target_files_paths, prompt_path, PATH_BASE_OUTPUT)
-    resultados = open(results_path + ".csv", "w")
+    results_path = get_results_path(target_files_paths, prompt_path, PATH_RESULTS)
+    resultados = open(results_path, "w")
     resultados.write("Sentença,direito de arrependimento,descumprimento de oferta,extravio definitivo,extravio temporário,intervalo de extravio,violação,cancelamento (sem realocação)/alteração de destino,atraso de voo,intervalo de atraso,culpa exclusiva do consumidor,inoperabilidade do aeroporto,no show,overbooking,assistência da companhia aérea,agência de viagem,hipervulnerabilidade\n")
 
     try:
@@ -134,9 +136,6 @@ def apply_prompt_to_files(target_files_paths, prompt_path, output_path=""):
     finally:      
         resultados.close()
         log.close()
-        if verbose:
-            print("Converting csv to xlsx file.")
-        convert_csv_to_xlsx(results_path)
 
     if alternative_save:
         prompt_name = prompt_path.split(os.sep)[-1].replace(".txt", "")
@@ -147,7 +146,16 @@ def apply_prompt_to_files(target_files_paths, prompt_path, output_path=""):
             store_output_results(list_outputs, output_path, base_file_name, output_type)
 
     if verbose:
-            print("End of execution.")
+        print("Converting csv to xlsx file.")
+    convert_csv_to_xlsx(results_path)
+
+    if verbose:
+        print("Formatting time variables")
+    formatted_res_dir_path = get_formatted_results_path(results_path)
+    convert_time_to_numeric(results_path, formatted_res_dir_path)
+    
+    if verbose:
+        print("End of execution.")
 
 def run_all_experiments():
     list_set_of_experiments = get_set_of_files_path(base_path=PATH_RAW_DOCUMENTS_FOLDERS)
