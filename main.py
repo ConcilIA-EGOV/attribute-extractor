@@ -91,8 +91,8 @@ def apply_prompt_to_files(target_files_paths, prompt_path, output_path=""):
                 # Pegando a linha com os resultados
                 result_index = None
                 for i, row in enumerate(response_for_db):
-                    row_elements = row.split(',')
-                    if (len(row_elements) > 3 and all(not element.isdigit() for element in row_elements)):
+                    row_elements = row.split(',')[:4]
+                    if (len(row_elements) > 3 and any(element == "S" or element == "N" for element in row_elements)):
                         result_index = i
                         break
                 
@@ -100,7 +100,6 @@ def apply_prompt_to_files(target_files_paths, prompt_path, output_path=""):
                     csv_block = sentenca + "response format error" + "\n"
                 else:
                     csv_block = sentenca + response_for_db[result_index] + "\n"
-
 
                 # Salvando Resultado
                 resultados.write(csv_block)

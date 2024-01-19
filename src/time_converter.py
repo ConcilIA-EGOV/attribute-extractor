@@ -4,6 +4,10 @@ import os
 
 from src.file_operations import ensure_directory_exists
 
+""" 
+TODO:
+Tratar os casos em que a resposta veio em formato com erro
+""" 
 
 def convert_time_to_numeric(csv_origin_path, res_dir_path):    
     # Verificando se o arquivo origem existe
