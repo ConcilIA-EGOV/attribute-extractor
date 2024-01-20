@@ -97,7 +97,7 @@ def apply_prompt_to_files(target_files_paths, prompt_path, output_path=""):
                         break
                 
                 if (result_index == None):
-                    csv_block = sentenca + "response format error" + "\n"
+                    csv_block = sentenca + "-,"*15 + '-' + "\n"
                 else:
                     csv_block = sentenca + response_for_db[result_index] + "\n"
 

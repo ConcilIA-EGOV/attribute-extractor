@@ -47,12 +47,12 @@ def convert_time_to_numeric(csv_origin_path, res_dir_path):
         else:
             atraso = ':'.join(list_atraso)
 
-        row['intervalo de extravio'] = extravio
-        row['intervalo de atraso'] = atraso
-
         # Salva os resultados com os novos valores para
         # os intervalos de extravio e de atraso
+        row['intervalo de extravio'] = extravio
+        row['intervalo de atraso'] = atraso
         csv_writer.writerow(row.values())
+        
 
     origin_file.close()
     formatted_file.close()
