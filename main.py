@@ -39,6 +39,7 @@ def apply_prompt_to_files(target_files_paths, prompt_path, output_path=""):
     resultados = open(results_path, "w")
     resultados.write("Sentença,direito de arrependimento,descumprimento de oferta,extravio definitivo,extravio temporário,intervalo de extravio,violação,cancelamento (sem realocação)/alteração de destino,atraso de voo,intervalo de atraso,culpa exclusiva do consumidor,inoperabilidade do aeroporto,no show,overbooking,assistência da companhia aérea,agência de viagem,hipervulnerabilidade\n")
 
+    total_tokens = 0
     try:
         # teste = 0
         for file_path in tqdm.tqdm(target_files_paths):
@@ -67,7 +68,7 @@ def apply_prompt_to_files(target_files_paths, prompt_path, output_path=""):
                 )
                 t2 = time.time()
 
-                # if teste == 6:
+                # if teste == 2:
                 #     raise Exception("Testando interrupções")
 
                 # Extraindo resultado
@@ -87,6 +88,9 @@ def apply_prompt_to_files(target_files_paths, prompt_path, output_path=""):
                 # log.write("Input tokens: " + str(input_tokens) + "\n")
                 # log.write("Output tokens: " + str(output_tokens) + "\n")
                 # log.write("Total tokens: " + str(input_tokens + output_tokens) + "\n")
+
+                # Somando quantidade de tokens utilizados
+                total_tokens += input_tokens + output_tokens
 
                 # Pegando a linha com os resultados
                 result_index = None
@@ -131,8 +135,9 @@ def apply_prompt_to_files(target_files_paths, prompt_path, output_path=""):
                 # teste += 1
     
     except Exception as e:
-        print(e)
-    finally:      
+        print("Erro:", e)
+    finally:     
+        log.write("Tokens utilizados no experimento: " + str(total_tokens)) 
         resultados.close()
         log.close()
 
