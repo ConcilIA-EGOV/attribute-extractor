@@ -4,7 +4,7 @@
 sentence_repetitions = 1
 
 # Tempo de espera, em segundos, entre cada requisição
-time_between_requests = 0
+time_between_requests = 1
 
 # Método de salvar os resultados feito pelo Thiago
 # Com opções txt, json e csv (com informações)
@@ -16,4 +16,7 @@ verbose = False
 
 # Faz com que a aplicação acesse a API da OpenAI. Caso esteja desabilitado,
 # utiliza uma mock response (para fins de desenvolvimento)
-api_access = False
+api_access = True
+
+# Se for verdadeiro, executa os prompts por conjunto de variáveis
+groups_variables = True
