@@ -33,19 +33,24 @@ def convert_time_to_numeric(csv_origin_path, res_dir_path):
     # Escreve o cabeçalho
     csv_writer.writerow(csv_reader.fieldnames)
     for row in csv_reader:
-        # Intervalo de extravio
-        list_extravio = row['intervalo de extravio'].split(':')
-        if (len(list_extravio) == 2):
-            extravio = int(list_extravio[0]) + round(int(list_extravio[1])/60, 2)
-        else:
-            extravio = ':'.join(list_extravio)
+        try:
+            # Intervalo de extravio
+            list_extravio = row['intervalo de extravio'].split(':')
+            if (len(list_extravio) == 2):
+                extravio = int(list_extravio[0]) + round(int(list_extravio[1])/60, 2)
+            else:
+                extravio = ':'.join(list_extravio)
 
-        # Intervalo de atraso
-        list_atraso = row['intervalo de atraso'].split(':')
-        if (len(list_atraso) == 2):
-            atraso = int(list_atraso[0]) + round(int(list_atraso[1])/60, 2)
-        else:
-            atraso = ':'.join(list_atraso)
+            # Intervalo de atraso
+            list_atraso = row['intervalo de atraso'].split(':')
+            if (len(list_atraso) == 2):
+                atraso = int(list_atraso[0]) + round(int(list_atraso[1])/60, 2)
+            else:
+                atraso = ':'.join(list_atraso)
+        except Exception as e:
+            print("Erro", e, "ao converter o tempo para numérico")
+            extravio = row['intervalo de extravio']
+            atraso = row['intervalo de atraso']
 
         # Salva os resultados com os novos valores para
         # os intervalos de extravio e de atraso

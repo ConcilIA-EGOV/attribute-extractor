@@ -6,7 +6,7 @@ import time
 
 import tqdm
 
-from config import sentence_repetitions, time_between_requests, alternative_save, output_types, verbose, groups_variables
+from config import sentence_repetitions, time_between_requests, alternative_save, output_types, verbose, groups_variables, MODEL
 from src.api import send_prompt, get_api_key
 from src.file_operations import list_raw_files_in_folder, read_txt_file, store_output_results, get_set_of_files_path, \
     get_list_of_prompts, get_results_path, get_log_path, convert_csv_to_xlsx, get_formatted_results_path
@@ -50,12 +50,12 @@ def apply_prompt_to_files(experiment, list_prompts, output_path=""):
         resultados.write("Sentença,direito de arrependimento,descumprimento de oferta,extravio definitivo,extravio temporário,intervalo de extravio,violação,cancelamento (sem realocação)/alteração de destino,atraso de voo,intervalo de atraso,culpa exclusiva do consumidor,inoperabilidade do aeroporto,no show,overbooking,assistência da companhia aérea,agência de viagem,hipervulnerabilidade\n")
 
         total_tokens = 0
-        try:
-            # teste = 0
-            for file_path in tqdm.tqdm(target_files_paths):
-                
-                # Repetições de cada sentença
-                for request in range(sentence_repetitions):
+        # teste = 0
+        for file_path in tqdm.tqdm(target_files_paths):
+            
+            # Repetições de cada sentença
+            for request in range(sentence_repetitions):
+                try:
                     file_results = {}
 
                     if verbose:
@@ -73,7 +73,7 @@ def apply_prompt_to_files(experiment, list_prompts, output_path=""):
                     response, input_tokens, output_tokens = send_prompt(
                         full_prompt,
                         api_key=get_api_key(),
-                        model="gpt-4-1106-preview",
+                        model=MODEL,
                         temperature=1.0
                     )
                     t2 = time.time()
@@ -105,8 +105,8 @@ def apply_prompt_to_files(experiment, list_prompts, output_path=""):
                     # Pegando a linha com os resultados
                     result_index = None
                     for i, row in enumerate(response_for_db):
-                        row_elements = row.split(',')[:4]
-                        if (len(row_elements) > 3 and any(element == "S" or element == "N" for element in row_elements)):
+                        row_elements = row.split(',')
+                        if (any(element == "S" or element == "N" for element in row_elements)):
                             result_index = i
                             break
                     
@@ -143,13 +143,11 @@ def apply_prompt_to_files(experiment, list_prompts, output_path=""):
                         time.sleep(time_between_requests)
                 
                     # teste += 1
-        
-        except Exception as e:
-            print("Erro:", e)
-        finally:     
-            log.write("Tokens utilizados no experimento: " + str(total_tokens)) 
-            resultados.close()
-            log.close()
+                except Exception as e:
+                    print("Erro em apply_prompt_to_files:", e)
+        log.write("Tokens utilizados no experimento: " + str(total_tokens)) 
+        resultados.close()
+        log.close()
 
         if alternative_save:
             prompt_name = prompt_path.split(os.sep)[-1].replace(".txt", "")
@@ -161,7 +159,7 @@ def apply_prompt_to_files(experiment, list_prompts, output_path=""):
 
         if verbose:
             print("Converting csv to xlsx file.")
-        # convert_csv_to_xlsx(results_path)
+        convert_csv_to_xlsx(results_path)
 
         if verbose:
             print("Formatting time variables")
@@ -171,7 +169,7 @@ def apply_prompt_to_files(experiment, list_prompts, output_path=""):
         if verbose:
             print("End of execution.")
 
-def apply__group_prompts_to_files(experiment, list_prompts, output_path=""):
+def apply_group_prompts_to_files(experiment, list_prompts, output_path=""):
     target_files_paths = list_raw_files_in_folder(experiment)
 
     # Abrindo arquivo de resultados
@@ -189,25 +187,25 @@ def apply__group_prompts_to_files(experiment, list_prompts, output_path=""):
         list_outputs = []
 
     total_tokens = 0
-    try:
-        # teste = 0
-        for file_path in tqdm.tqdm(target_files_paths):
-            # Repetições de cada sentença
-            for request in range(sentence_repetitions):
-                arquivo = list(file_path[:-4])
-                arquivo.reverse()
-                limite = arquivo.index('/')
-                temp = arquivo[:limite]
-                temp.reverse()
-                sentenca = "".join(temp) + ','
+    # teste = 0
+    for file_path in tqdm.tqdm(target_files_paths):
+        # Repetições de cada sentença
+        for request in range(sentence_repetitions):
+            arquivo = list(file_path[:-4])
+            arquivo.reverse()
+            limite = arquivo.index('/')
+            temp = arquivo[:limite]
+            temp.reverse()
+            sentenca = "".join(temp) + ','
 
-                # Salvando response no arquivo de log
-                log.write("Sentença " + sentenca[:-1] + ":\n")
-                
-                resultados.write(sentenca)
-                
-                csv_block = ["" for i in range(16)]
-                for prompt_path in list_prompts:
+            # Salvando response no arquivo de log
+            log.write("Sentença " + sentenca[:-1] + ":\n")
+            
+            resultados.write(sentenca)
+            
+            csv_block = ["" for i in range(16)]
+            for prompt_path in list_prompts:
+                try:
                     print("-" * 50)
                     print("Using prompt: ", prompt_path)
 
@@ -228,7 +226,7 @@ def apply__group_prompts_to_files(experiment, list_prompts, output_path=""):
                     response, input_tokens, output_tokens = send_prompt(
                         full_prompt,
                         api_key=get_api_key(),
-                        model="gpt-4-1106-preview",
+                        model=MODEL,
                         temperature=1.0
                     )
                     t2 = time.time()
@@ -251,19 +249,21 @@ def apply__group_prompts_to_files(experiment, list_prompts, output_path=""):
                     # Pegando a linha com os resultados
                     result_index = None
                     for i, row in enumerate(response_for_db):
-                        row_elements = row.split(',')[:4]
-                        if (len(row_elements) > 3 and any(element == "S" or element == "N" for element in row_elements)):
+                        row_elements = row.split(',')
+                        if (any(el == "S" or el == "N" or el == '"S"' or el == '"N"' for el in row_elements)):
                             result_index = i
                             break
                     
                     if (result_index == None):
-                        csv_block = sentenca + "-,"*15 + '-' + "\n"
-                    else:
-                        unordered_block = response_for_db[result_index].split(',')
-                        indices = response_for_db[result_index - 1].split(',')
-                        for i in range(len(indices)):
-                            idx = int(indices[i]) - 1
-                            csv_block[idx] = unordered_block[i]
+                        csv_block = "=>Sem_Resposta<="
+                        continue
+                    unordered_block = response_for_db[result_index].split(',')
+                    indices = response_for_db[result_index - 1].split(',')
+                    for i in range(len(indices)):
+                        if len(indices[i]) > 0 and indices[i][0] == '"':
+                            indices[i] = indices[i][1:-1]
+                        idx = int(indices[i]) - 1
+                        csv_block[idx] = unordered_block[i]
 
                     if alternative_save:
                         # Saving info for later output handling (json, csv, etc.)
@@ -290,16 +290,15 @@ def apply__group_prompts_to_files(experiment, list_prompts, output_path=""):
                         time.sleep(time_between_requests)
                 
                     # teste += 1
+                except Exception as e:
+                    print("Erro em apply_group_prompts_to_files:", e)
 
-                # Salvando Resultado
-                resultados.write(",".join(csv_block) + "\n")
+            # Salvando Resultado
+            resultados.write(",".join(csv_block) + "\n")
     
-    except Exception as e:
-        print("Erro:", e)
-    finally:     
-        log.write("Tokens utilizados no experimento: " + str(total_tokens)) 
-        resultados.close()
-        log.close()
+    log.write("Tokens utilizados no experimento: " + str(total_tokens)) 
+    resultados.close()
+    log.close()
 
     if alternative_save:
         prompt_name = prompt_path.split(os.sep)[-1].replace(".txt", "")
@@ -335,7 +334,7 @@ def run_all_experiments():
 
         # Apply each available prompt for each experiment
         if groups_variables:
-            apply__group_prompts_to_files(experiment, list_prompts, PATH_BASE_OUTPUT)
+            apply_group_prompts_to_files(experiment, list_prompts, PATH_BASE_OUTPUT)
         else:
             apply_prompt_to_files(experiment, list_prompts, PATH_BASE_OUTPUT)
 
