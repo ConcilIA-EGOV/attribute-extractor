@@ -32,7 +32,7 @@ def num_tokens_from_string(string: str, encoding_name="cl100k_base") -> int:
     return num_tokens
 
 
-def send_prompt(prompt, api_key, model="text-davinci-003", temperature=0.7, retries=1):
+def send_prompt(prompt, api_key, model="text-davinci-003", temperature=0.5, retries=1):
     if len(api_key) == 0:
         raise Exception("API Key is required.")
     if len(prompt) == 0:

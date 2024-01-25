@@ -6,7 +6,7 @@ import time
 
 import tqdm
 
-from config import sentence_repetitions, time_between_requests, alternative_save, output_types, verbose, groups_variables, MODEL
+from config import sentence_repetitions, time_between_requests, alternative_save, output_types, verbose, groups_variables, MODEL, TEMPERATURE, CABECALHO
 from src.api import send_prompt, get_api_key
 from src.file_operations import list_raw_files_in_folder, read_txt_file, store_output_results, get_set_of_files_path, \
     get_list_of_prompts, get_results_path, get_log_path, convert_csv_to_xlsx, get_formatted_results_path
@@ -47,7 +47,7 @@ def apply_prompt_to_files(experiment, list_prompts, output_path=""):
         # Abrindo arquivo de resultados
         results_path = get_results_path(target_files_paths, prompt_path, PATH_RESULTS)
         resultados = open(results_path, "w")
-        resultados.write("Sentença,direito de arrependimento,descumprimento de oferta,extravio definitivo,extravio temporário,intervalo de extravio,violação,cancelamento (sem realocação)/alteração de destino,atraso de voo,intervalo de atraso,culpa exclusiva do consumidor,inoperabilidade do aeroporto,no show,overbooking,assistência da companhia aérea,agência de viagem,hipervulnerabilidade\n")
+        resultados.write(CABECALHO)
 
         total_tokens = 0
         # teste = 0
@@ -74,7 +74,7 @@ def apply_prompt_to_files(experiment, list_prompts, output_path=""):
                         full_prompt,
                         api_key=get_api_key(),
                         model=MODEL,
-                        temperature=1.0
+                        temperature=TEMPERATURE
                     )
                     t2 = time.time()
 
@@ -111,9 +111,10 @@ def apply_prompt_to_files(experiment, list_prompts, output_path=""):
                             break
                     
                     if (result_index == None):
-                        csv_block = sentenca + "-,"*15 + '-' + "\n"
-                    else:
-                        csv_block = sentenca + response_for_db[result_index] + "\n"
+                        if time_between_requests:
+                            time.sleep(time_between_requests)
+                        continue
+                    csv_block = sentenca + response_for_db[result_index] + "\n"
 
                     # Salvando Resultado
                     resultados.write(csv_block)
@@ -175,7 +176,7 @@ def apply_group_prompts_to_files(experiment, list_prompts, output_path=""):
     # Abrindo arquivo de resultados
     results_path = get_results_path(target_files_paths, "prompt_grupos.txt", PATH_RESULTS)
     resultados = open(results_path, "w")
-    resultados.write("Sentença,direito de arrependimento,descumprimento de oferta,extravio definitivo,extravio temporário,intervalo de extravio,violação,cancelamento (sem realocação)/alteração de destino,atraso de voo,intervalo de atraso,culpa exclusiva do consumidor,inoperabilidade do aeroporto,no show,overbooking,assistência da companhia aérea,agência de viagem,hipervulnerabilidade\n")
+    resultados.write(CABECALHO)
 
     # Abrindo arquivo com log das responses
     log_path = get_log_path(target_files_paths, "prompt_grupos.txt", PATH_LOG)
@@ -227,7 +228,7 @@ def apply_group_prompts_to_files(experiment, list_prompts, output_path=""):
                         full_prompt,
                         api_key=get_api_key(),
                         model=MODEL,
-                        temperature=1.0
+                        temperature=TEMPERATURE
                     )
                     t2 = time.time()
 
@@ -255,7 +256,8 @@ def apply_group_prompts_to_files(experiment, list_prompts, output_path=""):
                             break
                     
                     if (result_index == None):
-                        csv_block = "=>Sem_Resposta<="
+                        if time_between_requests:
+                            time.sleep(time_between_requests)
                         continue
                     unordered_block = response_for_db[result_index].split(',')
                     indices = response_for_db[result_index - 1].split(',')

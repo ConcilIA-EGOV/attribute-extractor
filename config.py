@@ -21,4 +21,11 @@ api_access = False
 # Se for verdadeiro, executa os prompts por conjunto de variáveis
 groups_variables = False
 
+# O Modelo que será utilizado
 MODEL = "gpt-4-1106-preview"
+
+# temperatura (grau de criatividade) do modelo
+TEMPERATURE = 0.2
+
+# Cabeçalho do arquivo de resultados
+CABECALHO = "Sentença,direito de arrependimento,descumprimento de oferta,extravio definitivo,extravio temporário,intervalo de extravio,violação,cancelamento (sem realocação)/alteração de destino,atraso de voo,intervalo de atraso,culpa exclusiva do consumidor,inoperabilidade do aeroporto,no show,overbooking,assistência da companhia aérea,agência de viagem,hipervulnerabilidade\n"
