@@ -8,8 +8,7 @@ run:
 	@python3 main.py
 
 clean:
-	rm -rf resultados
-	rm -rf data/log/*
+	rm -rf resultados_requisicao
 
 clean_prompts:
 	rm -rf data/prompts/*.txt

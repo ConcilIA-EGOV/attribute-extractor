@@ -2,7 +2,7 @@ import csv
 import pandas as pd
 import os
 
-from src.file_operations import ensure_directory_exists
+from src.file_operations import ensure_directory_exists, convert_csv_to_xlsx
 
 """ 
 TODO:
@@ -22,7 +22,7 @@ def convert_time_to_numeric(csv_origin_path, res_dir_path):
 
     # Path dos arquivos formatados
     result_csv_path = os.path.join(res_dir_path, "resultados_formatados.csv")
-    result_xlsx_file = os.path.join(res_dir_path, "resultados_formatados.xlsx")
+    # result_xlsx_file = os.path.join(res_dir_path, "resultados_formatados.xlsx")
 
     origin_file = open(csv_origin_path, "r")
     formatted_file = open(result_csv_path, "w")
@@ -63,8 +63,9 @@ def convert_time_to_numeric(csv_origin_path, res_dir_path):
     formatted_file.close()
 
     # Convertendo para xlsx
-    data_frame = pd.read_csv(result_csv_path)
-    data_frame.to_excel(result_xlsx_file, index=False)
+    convert_csv_to_xlsx(result_csv_path, "resultados_formatados.xlsx")
+    # data_frame = pd.read_csv(result_csv_path)
+    # data_frame.to_excel(result_xlsx_file, index=False)
 
 def main():
     convert_time_to_numeric()

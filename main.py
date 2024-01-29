@@ -15,9 +15,9 @@ from src.time_converter import convert_time_to_numeric
 PATH_RAW_DOCUMENTS_FOLDERS = "data/sentencas"
 PATH_PROMPTS = "data/prompts"
 PATH_PROMPTS_GRUPOS = "data/prompts/grupos"
-PATH_BASE_OUTPUT = "data/resultados"
-PATH_LOG = "data/log"
-PATH_RESULTS = "resultados"
+PATH_BASE_OUTPUT = "data/resultados_requisicao"
+PATH_LOG = "resultados_requisicao"
+PATH_RESULTS = "resultados_requisicao"
 
 
 def merge_prompt_and_document(document_text, prompt):
@@ -111,9 +111,11 @@ def apply_prompt_to_files(experiment, list_prompts, output_path=""):
                             break
                     
                     if (result_index == None):
+                        result_index = 0
+                        response_for_db[result_index] = ""
                         if time_between_requests:
                             time.sleep(time_between_requests)
-                        continue
+
                     csv_block = sentenca + response_for_db[result_index] + "\n"
 
                     # Salvando Resultado
@@ -204,7 +206,7 @@ def apply_group_prompts_to_files(experiment, list_prompts, output_path=""):
             
             resultados.write(sentenca)
             
-            csv_block = ["" for i in range(16)]
+            csv_block = ["" for i in range(len(CABECALHO.split(',')) - 1)]
             for prompt_path in list_prompts:
                 try:
                     print("-" * 50)

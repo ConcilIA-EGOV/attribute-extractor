@@ -106,23 +106,26 @@ def get_log_path(target_files_paths, prompt_path, PATH_LOG):
     return log_path
 
 
-def convert_csv_to_xlsx(origin_csv_path):    
+def convert_csv_to_xlsx(origin_csv_path, xlsx_file="resultados_sem_formatacao.xlsx"):    
     # Verificando se o arquivo existe
-    if not os.path.exists(origin_csv_path):
-        print("O arquivo de resultados não foi encontrado")
-        return
-    
-    # Setando diretório do arquivo xlsx
-    xlsx_dir_path = os.sep.join(origin_csv_path.split(os.sep)[:-1])
+    try:
+        if not os.path.exists(origin_csv_path):
+            print("O arquivo de resultados não foi encontrado")
+            return
+        
+        # Setando diretório do arquivo xlsx
+        xlsx_dir_path = os.sep.join(origin_csv_path.split(os.sep)[:-1])
 
-    # Setando arquivo xlsx
-    xlsx_file = os.path.join(xlsx_dir_path, "resultados_sem_formatacao.xlsx")
+        # Setando arquivo xlsx
+        xlsx_file = os.path.join(xlsx_dir_path, xlsx_file)
 
-    # Transformando CSV em DataFrame
-    data_frame = pd.read_csv(origin_csv_path)
+        # Transformando CSV em DataFrame
+        data_frame = pd.read_csv(origin_csv_path)
 
-    # Transformando Data Frame em XLSX
-    data_frame.to_excel(xlsx_file, index=False)
+        # Transformando Data Frame em XLSX
+        data_frame.to_excel(xlsx_file, index=False)
+    except:
+        print("Erro na função convert_csv_to_xlsx")
 
 
 def get_formatted_results_path(csv_origin_path):
