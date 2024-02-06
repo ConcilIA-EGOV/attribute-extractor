@@ -19,7 +19,7 @@ import tiktoken
 import sys
 from dotenv import load_dotenv
 sys.path.append('../config.py')
-from config import api_access
+from config import API_ACCESS
 
 
 def num_tokens_from_string(string: str, encoding_name="cl100k_base") -> int:
@@ -46,7 +46,7 @@ def send_prompt(prompt, api_key, model="text-davinci-003", temperature=0.7, retr
 
     for retry in range(retries):
         try:
-            if api_access:
+            if API_ACCESS:
                 # Generate a response using the OpenAI API
                 response = openai.chat.completions.create(
                     model=model,
@@ -65,7 +65,7 @@ def send_prompt(prompt, api_key, model="text-davinci-003", temperature=0.7, retr
     if response is None:
         raise Exception("OpenAI did not respond.")
 
-    if api_access:
+    if API_ACCESS:
         # Extract and count tokens in the generated text from the API response
         generated_text = response.choices[0].message.content.strip()
     else:

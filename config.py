@@ -1,29 +1,29 @@
 # Variáveis para execução da aplicação
 
 # Repetições de cada sentença
-sentence_repetitions = 1
+SENTENCE_REPETITIONS = 1
 
 # Tempo de espera, em segundos, entre cada requisição
-time_between_requests = 4
+TIME_BETWEEN_REQUESTS = 0
 
 # Método de salvar os resultados feito pelo Thiago
 # Com opções txt, json e csv (com informações)
-alternative_save = False
-output_types = ["csv", "txt"]
+ALTERNATIVE_SAVE = False
+OUTPUT_TYPES = ["csv", "txt"]
 
 # Torna a aplicação mais verborrágica
-verbose = False
+VERBOSE = False
 
 # Faz com que a aplicação acesse a API da OpenAI. Caso esteja desabilitado,
 # utiliza uma mock response (para fins de desenvolvimento)
-api_access = True
+API_ACCESS = True
 
 # Se for verdadeiro, executa os prompts por conjunto de variáveis
-groups_variables = False
+GROUPS_VARIABLES = False
 
 # O Modelo que será utilizado
-MODEL = "gpt-4-1106-preview"
-# MODEL = "gpt-3.5-turbo-1106"
+# MODEL = "gpt-4-1106-preview"
+MODEL = "gpt-3.5-turbo-1106"
 
 # temperatura (grau de criatividade) do modelo
 TEMPERATURE = 0.7
