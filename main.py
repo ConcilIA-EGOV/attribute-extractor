@@ -6,7 +6,7 @@ import time
 
 import tqdm
 
-from config import SENTENCE_REPETITIONS, TIME_BETWEEN_REQUESTS, ALTERNATIVE_SAVE, OUTPUT_TYPES, VERBOSE, GROUPS_VARIABLES, MODEL, TEMPERATURE, CABECALHO
+from config import SENTENCE_REPETITIONS, REPEAT_N, ALTERNATIVE_SAVE, OUTPUT_TYPES, VERBOSE, GROUPS_VARIABLES, CABECALHO
 from src.api import send_prompt, get_api_key
 from src.file_operations import list_raw_files_in_folder, read_txt_file, store_output_results, get_set_of_files_path, \
     get_list_of_prompts, get_results_path, get_log_path, convert_csv_to_xlsx, get_formatted_results_path
@@ -50,8 +50,6 @@ def find_results(response_for_db:list[str]) -> (str, list):
     if (result_index == None):
         result_index = 0
         response_for_db[result_index] = ""
-        if TIME_BETWEEN_REQUESTS:
-            time.sleep(TIME_BETWEEN_REQUESTS)
     
     if GROUPS_VARIABLES:
         indices = response_for_db[result_index - 1].split(',')
@@ -88,7 +86,10 @@ def apply_prompt_to_files(experiment, list_prompts, output_path=""):
         for file_path in tqdm.tqdm(target_files_paths):
             
             # Repetições de cada sentença
-            for request in range(SENTENCE_REPETITIONS):
+            repeticao_de_requisicoes = 1
+            if not REPEAT_N:
+                repeticao_de_requisicoes = SENTENCE_REPETITIONS
+            for request in range(repeticao_de_requisicoes):
                 try:
                     file_results = {}
 
@@ -104,32 +105,27 @@ def apply_prompt_to_files(experiment, list_prompts, output_path=""):
                         print("Sending request to OpenAI")
 
                     t1 = time.time()
-                    response, input_tokens, output_tokens = send_prompt(
-                        full_prompt,
-                        api_key=get_api_key(),
-                        model=MODEL,
-                        temperature=TEMPERATURE
-                    )
+                    responses, input_tokens, output_tokens = send_prompt(full_prompt)
                     t2 = time.time()
 
                     # Extraindo resultado
-                    response = response.replace("```", "").strip()
-                    response_for_db = response.split('\n')
-                    sentenca = get_sentence(file_path)
-
-                    # Salvando response no arquivo de log
-                    log.write("Sentença " + sentenca[:-1] + ":\n")
-                    log.write(response + "\n\n")
-
                     # Somando quantidade de tokens utilizados
                     total_tokens += input_tokens + output_tokens
+                    for response in responses:
+                        response = response.replace("```", "").strip()
+                        response_for_db = response.split('\n')
+                        sentenca = get_sentence(file_path)
 
-                    # Pegando a linha com os resultados
-                    result = find_results(response_for_db)
-                    csv_block = sentenca + result
+                        # Salvando response no arquivo de log
+                        log.write("Sentença " + sentenca[:-1] + ":\n")
+                        log.write(response + "\n\n")
 
-                    # Salvando Resultado
-                    resultados.write(csv_block)
+                        # Pegando a linha com os resultados
+                        result = find_results(response_for_db)
+                        csv_block = sentenca + result
+
+                        # Salvando Resultado
+                        resultados.write(csv_block)
 
                     if ALTERNATIVE_SAVE:
                         # Saving info for later output handling (json, csv, etc.)
@@ -151,9 +147,6 @@ def apply_prompt_to_files(experiment, list_prompts, output_path=""):
                         print(f"Response time: {round(t2 - t1, 3)} seconds")
                         print(f"Input tokens: {input_tokens}")
                         print(f"Output tokens: {output_tokens}")
-                    
-                    if TIME_BETWEEN_REQUESTS:
-                        time.sleep(TIME_BETWEEN_REQUESTS)
                 
                     # teste += 1
                 except Exception as e:
@@ -181,6 +174,10 @@ def apply_prompt_to_files(experiment, list_prompts, output_path=""):
         
         if VERBOSE:
             print("End of execution.")
+
+"""
+TODO: Adaptar para usar o parâmetro n.
+"""
 
 def apply_group_prompts_to_files(experiment, list_prompts, output_path=""):
     target_files_paths = list_raw_files_in_folder(experiment)
@@ -231,15 +228,11 @@ def apply_group_prompts_to_files(experiment, list_prompts, output_path=""):
                         print("Sending request to OpenAI")
 
                     t1 = time.time()
-                    response, input_tokens, output_tokens = send_prompt(
-                        full_prompt,
-                        api_key=get_api_key(),
-                        model=MODEL,
-                        temperature=TEMPERATURE
-                    )
+                    responses, input_tokens, output_tokens = send_prompt(full_prompt)
                     t2 = time.time()
 
                     # Extraindo resultado
+                    response = responses[0]
                     response = response.replace("```", "").strip()
                     response_for_db = response.split('\n')
                     log.write(response + "\n\n")
@@ -279,9 +272,6 @@ def apply_group_prompts_to_files(experiment, list_prompts, output_path=""):
                         print(f"Response time: {round(t2 - t1, 3)} seconds")
                         print(f"Input tokens: {input_tokens}")
                         print(f"Output tokens: {output_tokens}")
-                    
-                    if TIME_BETWEEN_REQUESTS:
-                        time.sleep(TIME_BETWEEN_REQUESTS)
                 
                     # teste += 1
                 except Exception as e:

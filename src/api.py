@@ -19,7 +19,7 @@ import tiktoken
 import sys
 from dotenv import load_dotenv
 sys.path.append('../config.py')
-from config import API_ACCESS
+from config import API_ACCESS, SENTENCE_REPETITIONS, REPEAT_N, TIME_BETWEEN_REQUESTS, MODEL, TEMPERATURE
 
 
 def num_tokens_from_string(string: str, encoding_name="cl100k_base") -> int:
@@ -32,7 +32,8 @@ def num_tokens_from_string(string: str, encoding_name="cl100k_base") -> int:
     return num_tokens
 
 
-def send_prompt(prompt, api_key, model="text-davinci-003", temperature=0.7, retries=1):
+def send_prompt(prompt:str, retries=1) -> (list[str], int, int):
+    api_key = get_api_key()
     if len(api_key) == 0:
         raise Exception("API Key is required.")
     if len(prompt) == 0:
@@ -40,21 +41,26 @@ def send_prompt(prompt, api_key, model="text-davinci-003", temperature=0.7, retr
 
     # Set your OpenAI API key
     openai.api_key = api_key
-
-    # Count tokens in the prompt
-    prompt_tokens = num_tokens_from_string(prompt)
+    request_repetitions = 1
+    if REPEAT_N:
+        request_repetitions = SENTENCE_REPETITIONS
 
     for retry in range(retries):
         try:
             if API_ACCESS:
                 # Generate a response using the OpenAI API
                 response = openai.chat.completions.create(
-                    model=model,
+                    model=MODEL,
+                    n=request_repetitions,
                     messages=[{"role": "user", "content": prompt}],
-                    temperature=temperature
+                    temperature=TEMPERATURE
                 )
+                if TIME_BETWEEN_REQUESTS:
+                    time.sleep(TIME_BETWEEN_REQUESTS)                
             else:
-                response = mock_response
+                response = []
+                for i in range(request_repetitions):
+                    response.append(mock_response['choices'][0])
             break
         except Exception as e:
             response = None
@@ -67,14 +73,18 @@ def send_prompt(prompt, api_key, model="text-davinci-003", temperature=0.7, retr
 
     if API_ACCESS:
         # Extract and count tokens in the generated text from the API response
-        generated_text = response.choices[0].message.content.strip()
+        generated_responses_list = [choice.message.content.strip() for choice in response.choices]
+        generated_tokens = response.usage.completion_tokens
+        prompt_tokens = response.usage.prompt_tokens
     else:
         # Response simulada (para desenvolvimento), devido ao não acesso à API
-        generated_text = response['choices'][0]['message']['content'].strip()
+        generated_responses_list = [choice['message']['content'].strip() for choice in response]
+        prompt_tokens = num_tokens_from_string(prompt)
+        generated_tokens = 0
+        for text in generated_responses_list:
+            generated_tokens += num_tokens_from_string(text)
 
-    generated_tokens = num_tokens_from_string(generated_text)
-
-    return generated_text, prompt_tokens, generated_tokens
+    return generated_responses_list, prompt_tokens, generated_tokens
 
 
 def get_api_key():
