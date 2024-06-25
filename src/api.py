@@ -32,7 +32,7 @@ def num_tokens_from_string(string: str, encoding_name="cl100k_base") -> int:
     return num_tokens
 
 
-def send_prompt(prompt:str, retries=1) -> (list[str], int, int):
+def send_prompt(prompt:str, retries=1) -> tuple[list[str], int, int]:
     api_key = get_api_key()
     if len(api_key) == 0:
         raise Exception("API Key is required.")

@@ -39,7 +39,7 @@ def get_sentence(file_path:str) -> str:
 
 
 # Pegando a linha com os resultados
-def find_results(response_for_db:list[str]) -> (str, list):
+def find_results(response_for_db:list[str]) -> tuple[str, list]:
     result_index = None
     for i, row in enumerate(response_for_db):
         row_elements = row.split(',')
