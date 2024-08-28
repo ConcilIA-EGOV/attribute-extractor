@@ -73,8 +73,10 @@ def store_output_results(list_outputs, output_path, base_folder_name, output_typ
             json.dump(list_outputs, json_file, indent=4)
 
 
-# Local onde será salvo o arquivo csv com o resultado das requisições
 def get_results_path(target_files_paths, prompt_path, PATH_BASE_OUTPUT):
+    """
+    Local onde será salvo o arquivo csv com o resultado das requisições
+    """
     prompt_name = prompt_path.split(os.sep)[-1].replace(".txt", "")
     documents_folder_name = target_files_paths[0].split(os.sep)[-2]
 
@@ -89,8 +91,10 @@ def get_results_path(target_files_paths, prompt_path, PATH_BASE_OUTPUT):
 
     return results_path
 
-# Local onde será salvo o log com as responses do experimento
 def get_log_path(target_files_paths, prompt_path, PATH_LOG):
+    """
+    Retorna o caminho onde será salvo o log com as responses do experimento
+    """
     prompt_name = prompt_path.split(os.sep)[-1].replace(".txt", "")
     documents_folder_name = target_files_paths[0].split(os.sep)[-2]
 

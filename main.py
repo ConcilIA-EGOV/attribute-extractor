@@ -6,7 +6,8 @@ import time
 
 import tqdm
 
-from config import SENTENCE_REPETITIONS, REPEAT_N, ALTERNATIVE_SAVE, OUTPUT_TYPES, VERBOSE, GROUPS_VARIABLES, CABECALHO
+from config import SENTENCE_REPETITIONS, REPEAT_N, ALTERNATIVE_SAVE
+from config import OUTPUT_TYPES, VERBOSE, GROUPS_VARIABLES, CABECALHOS, CABECALHO
 from src.api import send_prompt, get_api_key
 from src.file_operations import list_raw_files_in_folder, read_txt_file, store_output_results, get_set_of_files_path, \
     get_list_of_prompts, get_results_path, get_log_path, convert_csv_to_xlsx, get_formatted_results_path
@@ -59,8 +60,9 @@ def find_results(response_for_db:list[str]) -> tuple[str, list]:
 
 
 def apply_prompt_to_files(experiment, list_prompts, output_path=""):    
-    for prompt_path in list_prompts:
+    for p, prompt_path in enumerate(list_prompts):
         print("-" * 50)
+        prompt_text = read_txt_file(prompt_path)
         print("Using prompt: ", prompt_path)
         target_files_paths = list_raw_files_in_folder(experiment)
 
@@ -79,17 +81,14 @@ def apply_prompt_to_files(experiment, list_prompts, output_path=""):
         # Abrindo arquivo de resultados
         results_path = get_results_path(target_files_paths, prompt_path, PATH_RESULTS)
         resultados = open(results_path, "w")
-        resultados.write(CABECALHO)
+        cabecalho = CABECALHOS[p]
+        resultados.write(cabecalho)
 
         total_tokens = 0
         # teste = 0
         for file_path in tqdm.tqdm(target_files_paths):
             
-            # Repetições de cada sentença
-            repeticao_de_requisicoes = 1
-            if not REPEAT_N:
-                repeticao_de_requisicoes = SENTENCE_REPETITIONS
-            for request in range(repeticao_de_requisicoes):
+            for request in range(SENTENCE_REPETITIONS):
                 try:
                     file_results = {}
 
@@ -98,7 +97,6 @@ def apply_prompt_to_files(experiment, list_prompts, output_path=""):
                         print(f"Reading file: {file_path}")
 
                     document_text = read_txt_file(file_path)
-                    prompt_text = read_txt_file(prompt_path)
                     full_prompt = merge_prompt_and_document(document_text, prompt_text)
 
                     if VERBOSE:
@@ -185,7 +183,8 @@ def apply_group_prompts_to_files(experiment, list_prompts, output_path=""):
     # Abrindo arquivo de resultados
     results_path = get_results_path(target_files_paths, "prompt_grupos.txt", PATH_RESULTS)
     resultados = open(results_path, "w")
-    resultados.write(CABECALHO)
+    cabecalho = CABECALHO
+    resultados.write(cabecalho)
 
     # Abrindo arquivo com log das responses
     log_path = get_log_path(target_files_paths, "prompt_grupos.txt", PATH_LOG)
@@ -208,7 +207,7 @@ def apply_group_prompts_to_files(experiment, list_prompts, output_path=""):
             
             resultados.write(sentenca)
             
-            csv_block = ["" for i in range(len(CABECALHO.split(',')) - 1)]
+            csv_block = ["" for i in range(len(cabecalho.split(',')) - 1)]
             for prompt_path in list_prompts:
                 try:
                     print("-" * 50)
@@ -306,11 +305,11 @@ def apply_group_prompts_to_files(experiment, list_prompts, output_path=""):
 
 def run_all_experiments():
     list_set_of_experiments = get_set_of_files_path(base_path=PATH_RAW_DOCUMENTS_FOLDERS)
-    if GROUPS_VARIABLES:
-        list_prompts = get_list_of_prompts(prompt_base_path=PATH_PROMPTS_GRUPOS)
-    else:
-        list_prompts = get_list_of_prompts(prompt_base_path=PATH_PROMPTS)
-
+    
+    path_prompt = PATH_PROMPTS_GRUPOS if GROUPS_VARIABLES else PATH_PROMPTS
+    
+    list_prompts = get_list_of_prompts(prompt_base_path=path_prompt)
+    
     # The experiments are the individual folders with raw txt files.
     for experiment in list_set_of_experiments:
         print("=" * 50)

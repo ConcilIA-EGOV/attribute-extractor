@@ -14,7 +14,7 @@ VERBOSE = False
 
 # Faz com que a aplicação acesse a API da OpenAI. Caso esteja desabilitado,
 # utiliza uma mock response (para fins de desenvolvimento)
-API_ACCESS = True
+API_ACCESS = False
 
 # Se for verdadeiro, executa os prompts por conjunto de variáveis
 GROUPS_VARIABLES = False
@@ -27,7 +27,9 @@ MODEL = "gpt-4-1106-preview"
 TEMPERATURE = 0.7
 
 # Cabeçalho do arquivo de resultados
-CABECALHO = "sentença,direito_de_arrependimento,descumprimento_de_oferta,extravio_definitivo,extravio_temporário,intervalo_extravio_temporário,violação_furto_avaria,cancelamento/alteração_destino,atraso,intervalo_atraso,culpa_exclusiva_consumidor,condições_climáticas/fechamento_aeroporto,noshow,overbooking,assistência_cia_aérea,hipervulnerável\n"
+CABECALHOS = ["sentença,direito_de_arrependimento,descumprimento_de_oferta,extravio_definitivo,extravio_temporário,intervalo_extravio_temporário,violação_furto_avaria,cancelamento/alteração_destino,atraso,intervalo_atraso,culpa_exclusiva_consumidor,condições_climáticas/fechamento_aeroporto,noshow,overbooking,assistência_cia_aérea,hipervulnerável\n", "sentença,direito_de_arrependimento,descumprimento_de_oferta,extravio,intervalo_extravio,violação_furto_avaria,cancelamento/alteração_destino,atraso,intervalo_atraso,culpa_exclusiva_consumidor,condições_climáticas/fechamento_aeroporto,noshow,overbooking,assistência_cia_aérea,hipervulnerável\n"]
+# Cabeçalho do arquivo de resultados
+CABECALHO = CABECALHOS[0]
 
 INTERVALO_EXTRAVIO = "intervalo_extravio_temporário"
 INTERVALO_ATRASO = "intervalo_atraso"

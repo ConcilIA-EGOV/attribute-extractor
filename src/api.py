@@ -41,9 +41,7 @@ def send_prompt(prompt:str, retries=1) -> tuple[list[str], int, int]:
 
     # Set your OpenAI API key
     openai.api_key = api_key
-    request_repetitions = 1
-    if REPEAT_N:
-        request_repetitions = SENTENCE_REPETITIONS
+    request_repetitions = SENTENCE_REPETITIONS
 
     for retry in range(retries):
         try:
@@ -59,7 +57,7 @@ def send_prompt(prompt:str, retries=1) -> tuple[list[str], int, int]:
                     time.sleep(TIME_BETWEEN_REQUESTS)                
             else:
                 response = []
-                for i in range(request_repetitions):
+                for _ in range(request_repetitions):
                     response.append(mock_response['choices'][0])
             break
         except Exception as e:
