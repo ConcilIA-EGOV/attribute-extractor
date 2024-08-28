@@ -167,8 +167,8 @@ def apply_prompt_to_files(experiment, list_prompts, output_path=""):
 
         if VERBOSE:
             print("Formatting time variables")
-        formatted_res_dir_path = get_formatted_results_path(results_path)
-        convert_time_to_numeric(results_path, formatted_res_dir_path)
+        # formatted_res_dir_path = get_formatted_results_path(results_path)
+        # convert_time_to_numeric(results_path, formatted_res_dir_path)
         
         if VERBOSE:
             print("End of execution.")
