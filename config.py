@@ -1,6 +1,6 @@
 # Variáveis para execução da aplicação
 
-# Repetições de cada sentença
+# Repetições de cada sentenca
 SENTENCE_REPETITIONS = 1
 
 # Se vai repetir usando o parâmetro n ou não
@@ -27,11 +27,19 @@ MODEL = "gpt-4-1106-preview"
 TEMPERATURE = 0.7
 
 # Cabeçalho do arquivo de resultados
-CABECALHOS = ["sentença,direito_de_arrependimento,descumprimento_de_oferta,extravio_definitivo,extravio_temporário,intervalo_extravio_temporário,violação_furto_avaria,cancelamento/alteração_destino,atraso,intervalo_atraso,culpa_exclusiva_consumidor,condições_climáticas/fechamento_aeroporto,noshow,overbooking,assistência_cia_aérea,hipervulnerável\n", "sentença,direito_de_arrependimento,descumprimento_de_oferta,extravio,intervalo_extravio,violação_furto_avaria,cancelamento/alteração_destino,atraso,intervalo_atraso,culpa_exclusiva_consumidor,condições_climáticas/fechamento_aeroporto,noshow,overbooking,assistência_cia_aérea,hipervulnerável\n"]
+CABECALHOS = [
+    "sentenca,direito_de_arrependimento,descumprimento_de_oferta,extravio_definitivo,extravio_temporario,intervalo_extravio_temporario,violacao_furto_avaria,cancelamento/alteracao_destino,atraso,intervalo_atraso,culpa_exclusiva_consumidor,condicoes_climaticas/fechamento_aeroporto,noshow,overbooking,assistencia_cia_aerea,hipervulneravel\n", # original, refinada para atraso
+    "sentenca,direito_de_arrependimento,descumprimento_de_oferta,extravio_definitivo,extravio_temporario,intervalo_extravio_temporario,violacao_furto_avaria,atraso,intervalo_atraso_ou_cancelamento,culpa_exclusiva_consumidor,condicoes_climaticas/fechamento_aeroporto,noshow,overbooking,assistencia_cia_aerea,hipervulneravel\n", # sem cancelamento/alteracao_destino
+    "sentenca,direito_de_arrependimento,descumprimento_de_oferta,extravio_definitivo,extravio_temporario,intervalo_extravio_temporario,violacao_furto_avaria,atraso,intervalo_atraso_ou_cancelamento,culpa_exclusiva_consumidor,condicoes_climaticas/fechamento_aeroporto,noshow,overbooking,assistencia_cia_aerea,hipervulneravel\n", # sem cancelamento/alteracao_destino, usa -1 para intervalo_atraso
+    "sentenca,direito_de_arrependimento,descumprimento_de_oferta,extravio_definitivo,extravio_temporario,intervalo_extravio_temporario,violacao_furto_avaria,atraso,intervalo_atraso_ou_cancelamento,culpa_exclusiva_consumidor,condicoes_climaticas/fechamento_aeroporto,noshow,overbooking,assistencia_cia_aerea,hipervulneravel\n", # sem cancelamento/alteracao_destino, usa 0 para intervalo_atraso
+    "sentenca,direito_de_arrependimento,descumprimento_de_oferta,extravio_definitivo,extravio_temporario,intervalo_extravio_temporario,violacao_furto_avaria,intervalo_atraso_ou_cancelamento,culpa_exclusiva_consumidor,condicoes_climaticas/fechamento_aeroporto,noshow,overbooking,assistencia_cia_aerea,hipervulneravel\n", # sem atraso nem cancelamento/alteracao_destino
+    "sentenca,direito_de_arrependimento,descumprimento_de_oferta,extravio_definitivo,extravio_temporario,intervalo_extravio_temporario,violacao_furto_avaria,cancelamento/alteracao_destino,atraso,intervalo_atraso,culpa_exclusiva_consumidor,condicoes_climaticas/fechamento_aeroporto,noshow,overbooking,assistencia_cia_aerea,hipervulneravel\n", # original, refinada para extravio
+    "sentenca,direito_de_arrependimento,descumprimento_de_oferta,extravio_definitivo,intervalo_extravio,violacao_furto_avaria,cancelamento/alteracao_destino,atraso,intervalo_atraso,culpa_exclusiva_consumidor,condicoes_climaticas/fechamento_aeroporto,noshow,overbooking,assistencia_cia_aerea,hipervulneravel\n", # sem extravio_temporario
+    ]
 # Cabeçalho do arquivo de resultados
-CABECALHO = CABECALHOS[0]
+# CABECALHO = "sentenca,direito_de_arrependimento,descumprimento_de_oferta,extravio_definitivo,extravio_temporario,intervalo_extravio_temporario,violacao_furto_avaria,cancelamento/alteracao_destino,atraso,intervalo_atraso,culpa_exclusiva_consumidor,condicoes_climaticas/fechamento_aeroporto,noshow,overbooking,assistencia_cia_aerea,hipervulneravel\n"
 
-INTERVALO_EXTRAVIO = "intervalo_extravio_temporário"
+INTERVALO_EXTRAVIO = "intervalo_extravio_temporario"
 INTERVALO_ATRASO = "intervalo_atraso"
 
 # Método de salvar os resultados feito pelo Thiago
