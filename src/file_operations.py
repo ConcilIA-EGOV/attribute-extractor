@@ -13,15 +13,15 @@ def get_set_of_files_path(base_path):
 
 def get_list_of_prompts(prompt_base_path, ext="txt"):
     list_files = glob.glob(os.path.join(prompt_base_path, "*." + ext))
-    if len(list_files) > 0:
-        return list_files
+    if list_files and len(list_files) > 0:
+        return sorted(list_files)
     raise Exception("No prompts found")
 
 
 def list_raw_files_in_folder(path_to_folder, ext="txt"):
     # List files
     list_files_paths = glob.glob(os.path.join(path_to_folder, "*." + ext))
-    if len(list_files_paths) > 0:
+    if list_files_paths and len(list_files_paths):
         return sorted(list_files_paths)
     raise Exception("No raw files found")
 
