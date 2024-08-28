@@ -124,7 +124,7 @@ def convert_csv_to_xlsx(origin_csv_path, xlsx_file="resultados_sem_formatacao.xl
         xlsx_file = os.path.join(xlsx_dir_path, xlsx_file)
 
         # Transformando CSV em DataFrame
-        data_frame = pd.read_csv(origin_csv_path)
+        data_frame = pd.read_csv(origin_csv_path, index_col=None)
 
         # Transformando Data Frame em XLSX
         data_frame.to_excel(xlsx_file, index=False)

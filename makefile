@@ -8,11 +8,11 @@ run:
 	@python3 main.py
 
 clean:
-	rm -rf resultados_requisicao
+	@rm -rf resultados_requisicao
 
 clean_prompts:
-	rm -rf data/prompts/*.txt
-	rm -rf data/prompts/grupos/*.txt
+	@rm -rf data/prompts/*.txt
+	@rm -rf data/prompts/grupos/*.txt
 
 clean_sentencas:
-	rm -rf data/sentencas/*/*.txt
+	@rm -rf data/sentencas/*/*.txt
