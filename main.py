@@ -7,7 +7,7 @@ import time
 import tqdm
 
 from config import SENTENCE_REPETITIONS, REPEAT_N, ALTERNATIVE_SAVE
-from config import OUTPUT_TYPES, VERBOSE, GROUPS_VARIABLES, CABECALHOS, CABECALHO
+from config import OUTPUT_TYPES, VERBOSE, GROUPS_VARIABLES, CABECALHOS
 from src.api import send_prompt, get_api_key
 from src.file_operations import list_raw_files_in_folder, read_txt_file, store_output_results, get_set_of_files_path, \
     get_list_of_prompts, get_results_path, get_log_path, convert_csv_to_xlsx, get_formatted_results_path
@@ -183,7 +183,7 @@ def apply_group_prompts_to_files(experiment, list_prompts, output_path=""):
     # Abrindo arquivo de resultados
     results_path = get_results_path(target_files_paths, "prompt_grupos.txt", PATH_RESULTS)
     resultados = open(results_path, "w")
-    cabecalho = CABECALHO
+    cabecalho = CABECALHOS[0]
     resultados.write(cabecalho)
 
     # Abrindo arquivo com log das responses
