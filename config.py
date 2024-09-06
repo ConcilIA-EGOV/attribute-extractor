@@ -14,13 +14,14 @@ VERBOSE = False
 
 # Faz com que a aplicação acesse a API da OpenAI. Caso esteja desabilitado,
 # utiliza uma mock response (para fins de desenvolvimento)
-API_ACCESS = False
+API_ACCESS = True
 
 # Se for verdadeiro, executa os prompts por conjunto de variáveis
 GROUPS_VARIABLES = False
 
 # O Modelo que será utilizado
-MODEL = "gpt-4-1106-preview"
+MODEL = "gpt-4-2024-08-06"
+# MODEL = "gpt-4-1106-preview"
 # MODEL = "gpt-3.5-turbo-1106"
 
 # temperatura (grau de criatividade) do modelo
