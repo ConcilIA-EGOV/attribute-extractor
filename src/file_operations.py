@@ -105,7 +105,7 @@ def get_log_path(target_files_paths, prompt_path, PATH_LOG):
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
 
-    log_path = os.path.join(dir_path, "log")
+    log_path = os.path.join(dir_path, "sem_formatacao", "log")
 
     return log_path
 

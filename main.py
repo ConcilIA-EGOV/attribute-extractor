@@ -72,17 +72,17 @@ def apply_prompt_to_files(experiment, list_prompts, output_path=""):
         if ALTERNATIVE_SAVE:
             list_outputs = []
 
-        # Abrindo arquivo com log das responses
-        log_path = get_log_path(target_files_paths, prompt_path, PATH_LOG)
-        
-        log = open(log_path + ".txt", "w")
-        log.write("Responses\n\n")
-
         # Abrindo arquivo de resultados
         results_path = get_results_path(target_files_paths, prompt_path, PATH_RESULTS)
         resultados = open(results_path, "w")
         cabecalho = CABECALHOS[p]
         resultados.write(cabecalho)
+
+        # Abrindo arquivo com log das responses
+        log_path = get_log_path(target_files_paths, prompt_path, PATH_LOG)
+        
+        log = open(log_path + ".txt", "w")
+        log.write("Responses\n\n")
 
         total_tokens = 0
         # teste = 0
@@ -161,14 +161,14 @@ def apply_prompt_to_files(experiment, list_prompts, output_path=""):
             for output_type in OUTPUT_TYPES:
                 store_output_results(list_outputs, output_path, base_file_name, output_type)
 
-        if VERBOSE:
-            print("Converting csv to xlsx file.")
-        convert_csv_to_xlsx(results_path)
+            if VERBOSE:
+                print("Converting csv to xlsx file.")
+            convert_csv_to_xlsx(results_path)
 
-        if VERBOSE:
-            print("Formatting time variables")
-        formatted_res_dir_path = get_formatted_results_path(results_path)
-        convert_time_to_numeric(results_path, formatted_res_dir_path)
+            if VERBOSE:
+                print("Formatting time variables")
+            formatted_res_dir_path = get_formatted_results_path(results_path)
+            convert_time_to_numeric(results_path, formatted_res_dir_path)
         
         if VERBOSE:
             print("End of execution.")
