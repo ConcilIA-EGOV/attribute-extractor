@@ -11,7 +11,6 @@ Parametros
 """
 from utils.mock_res import mock_response
 import os
-import random
 import time
 
 import openai
@@ -19,7 +18,7 @@ import tiktoken
 import sys
 from dotenv import load_dotenv
 sys.path.append('../config.py')
-from config import API_ACCESS, SENTENCE_REPETITIONS, REPEAT_N, TIME_BETWEEN_REQUESTS, MODEL, TEMPERATURE
+from config import API_ACCESS, TIME_BETWEEN_REQUESTS, MODEL, TEMPERATURE
 
 
 def num_tokens_from_string(string: str, encoding_name="cl100k_base") -> int:
@@ -41,7 +40,7 @@ def send_prompt(prompt:str, retries=1) -> tuple[list[str], int, int]:
 
     # Set your OpenAI API key
     openai.api_key = api_key
-    request_repetitions = SENTENCE_REPETITIONS
+    request_repetitions = 1
 
     for retry in range(retries):
         try:

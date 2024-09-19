@@ -80,14 +80,14 @@ def get_results_path(target_files_paths, prompt_path, PATH_BASE_OUTPUT):
     prompt_name = prompt_path.split(os.sep)[-1].replace(".txt", "")
     documents_folder_name = target_files_paths[0].split(os.sep)[-2]
 
-    base_dir_name = "_".join(["experiment", prompt_name, documents_folder_name]).replace(" ", "-")
+    base_dir_name = "_".join([prompt_name, documents_folder_name]).replace(" ", "-")
 
-    dir_path = os.path.join(PATH_BASE_OUTPUT, base_dir_name, "sem_formatacao")
+    dir_path = os.path.join(PATH_BASE_OUTPUT, base_dir_name)
     
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
 
-    results_path = os.path.join(dir_path, "resultados_sem_formatacao.csv")
+    results_path = os.path.join(dir_path, "resposta_gpt.csv")
 
     return results_path
 
@@ -98,49 +98,13 @@ def get_log_path(target_files_paths, prompt_path, PATH_LOG):
     prompt_name = prompt_path.split(os.sep)[-1].replace(".txt", "")
     documents_folder_name = target_files_paths[0].split(os.sep)[-2]
 
-    base_dir_name = "_".join(["experiment", prompt_name, documents_folder_name]).replace(" ", "-")
+    base_dir_name = "_".join([prompt_name, documents_folder_name]).replace(" ", "-")
 
     dir_path = os.path.join(PATH_LOG, base_dir_name)
     
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
 
-    log_path = os.path.join(dir_path, "sem_formatacao", "log")
+    log_path = os.path.join(dir_path, "log_requisicao")
 
     return log_path
-
-
-def convert_csv_to_xlsx(origin_csv_path, xlsx_file="resultados_sem_formatacao.xlsx"):    
-    # Verificando se o arquivo existe
-    try:
-        if not os.path.exists(origin_csv_path):
-            print("O arquivo de resultados não foi encontrado")
-            return
-        
-        # Setando diretório do arquivo xlsx
-        xlsx_dir_path = os.sep.join(origin_csv_path.split(os.sep)[:-1])
-
-        # Setando arquivo xlsx
-        xlsx_file = os.path.join(xlsx_dir_path, xlsx_file)
-
-        # Transformando CSV em DataFrame
-        data_frame = pd.read_csv(origin_csv_path, index_col=None)
-
-        # Transformando Data Frame em XLSX
-        data_frame.to_excel(xlsx_file, index=False)
-    except:
-        print("Erro na função convert_csv_to_xlsx")
-
-
-def get_formatted_results_path(csv_origin_path):
-    # Verificando se o arquivo existe
-    if not os.path.exists(csv_origin_path):
-        print("O arquivo de resultados (sem formatação) não foi encontrado")
-        return
-    
-    # Criação do diretório de arquivos formatados
-    base_dir_path = os.sep.join(csv_origin_path.split(os.sep)[:-2])
-    res_dir_path = os.path.join(base_dir_path, "formatados")
-    ensure_directory_exists(res_dir_path)
-
-    return res_dir_path
