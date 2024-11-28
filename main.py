@@ -6,13 +6,12 @@ import time
 
 import tqdm
 
-from config import VERBOSE, CABECALHOS, PATH_LOG, PATH_RESULTS
+from config import VERBOSE, CABECALHOS, SENTENCES_REPETITIONS
 from config import PATH_RAW_DOCUMENTS_FOLDERS, PATH_PROMPTS, PATH_BASE_OUTPUT
 
 from src.api import send_prompt, get_api_key
 from src.file_operations import list_raw_files_in_folder, read_txt_file, get_set_of_files_path, \
     get_list_of_prompts, get_results_path, get_log_path #, convert_csv_to_xlsx, get_formatted_results_path
-# from src.time_converter import convert_time_to_numeric
 
 
 def merge_prompt_and_document(document_text, prompt):
@@ -49,7 +48,7 @@ def find_results(response_for_db:list[str]) -> tuple[str, list]:
     return response_for_db[result_index] + "\n"
 
 
-def apply_prompt_to_files(experiment, list_prompts, output_path=""):    
+def apply_prompt_to_files(experiment, list_prompts, output_path):    
     for p, prompt_path in enumerate(list_prompts):
         print("-" * 50)
         prompt_text = read_txt_file(prompt_path)
@@ -57,16 +56,16 @@ def apply_prompt_to_files(experiment, list_prompts, output_path=""):
         target_files_paths = list_raw_files_in_folder(experiment)
 
         # Apply the prompt
-        print("Applying to files:", len(target_files_paths))
+        print("Applying to %d files:" % len(target_files_paths))
 
         # Abrindo arquivo de resultados
-        results_path = get_results_path(target_files_paths, prompt_path, PATH_RESULTS)
+        results_path = get_results_path(target_files_paths, prompt_path, output_path)
         resultados = open(results_path, "w")
         cabecalho = CABECALHOS[p]
         resultados.write(cabecalho)
 
         # Abrindo arquivo com log das responses
-        log_path = get_log_path(target_files_paths, prompt_path, PATH_LOG)
+        log_path = get_log_path(target_files_paths, prompt_path, output_path)
         
         log = open(log_path + ".txt", "w")
         log.write("Responses\n\n")
@@ -75,8 +74,6 @@ def apply_prompt_to_files(experiment, list_prompts, output_path=""):
         # teste = 0
         for file_path in tqdm.tqdm(target_files_paths):            
             try:
-                file_results = {}
-
                 if VERBOSE:
                     print("=" * 50)
                     print(f"Reading file: {file_path}")
@@ -137,12 +134,13 @@ def run_all_experiments():
     list_prompts = get_list_of_prompts(prompt_base_path=path_prompt)
     
     # The experiments are the individual folders with raw txt files.
-    for experiment in list_set_of_experiments:
-        print("=" * 50)
-        print("Running experiment:", experiment)
+    for i in range(SENTENCES_REPETITIONS):
+        for experiment in list_set_of_experiments:
+            print("=" * 50)
+            print("Running experiment:", experiment)
 
-        # Apply each available prompt for each experiment
-        apply_prompt_to_files(experiment, list_prompts, PATH_BASE_OUTPUT)
+            # Apply each available prompt for each experiment
+            apply_prompt_to_files(experiment, list_prompts, PATH_BASE_OUTPUT + f'-{i+1}')
 
 
 def main():
