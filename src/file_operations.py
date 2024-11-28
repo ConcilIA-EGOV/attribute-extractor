@@ -7,7 +7,7 @@ import pandas as pd
 def get_set_of_files_path(base_path):
     folders = [os.path.join(base_path, f) for f in os.listdir(base_path) if os.path.isdir(os.path.join(base_path, f))]
     if len(folders) > 0:
-        return folders
+        return sorted(folders)
     raise Exception("No experiments found")
 
 
