@@ -6,13 +6,13 @@ VERBOSE = False
 
 # Faz com que a aplicação acesse a API da OpenAI. Caso esteja desabilitado,
 # utiliza uma mock response (para fins de desenvolvimento)
-API_ACCESS = True
+API_ACCESS = False
 
 # Se for verdadeiro, executa os prompts por conjunto de variáveis
 GROUPS_VARIABLES = False
 
 # repetiç]oes dos experimentos
-SENTENCES_REPETITIONS = 2
+SENTENCES_REPETITIONS = 3
 
 # O Modelo que será utilizado
 MODEL = "gpt-4o-2024-08-06"
