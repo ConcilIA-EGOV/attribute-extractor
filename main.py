@@ -20,7 +20,10 @@ def reorder_results(current_header:list[str],
     Reorder the values to match the intended header.
     """
     if not (len(current_header) == len(values) == len(intended_header)):
-        return values
+        limit = len(intended_header)
+        if len(values) < limit:
+            limit = len(values)
+        return values[:limit]
     result = []
     for header in intended_header:
         index = current_header.index(header)
