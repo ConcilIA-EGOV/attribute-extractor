@@ -3,13 +3,10 @@ TIME_BETWEEN_REQUESTS = 5
 
 # Faz com que a aplicação acesse a API da OpenAI. Caso esteja desabilitado,
 # utiliza uma mock response (para fins de desenvolvimento)
-API_ACCESS = False
-
-# Se for verdadeiro, executa os prompts por conjunto de variáveis
-GROUPS_VARIABLES = False
+API_ACCESS = True
 
 # repetiç]oes dos experimentos
-SENTENCES_REPETITIONS = 1
+SENTENCES_REPETITIONS = 3
 
 # O Modelo que será utilizado
 MODEL = "gpt-4o-2024-08-06"
@@ -25,6 +22,10 @@ CABECALHOS = [
         "sentenca,direito_de_arrependimento,descumprimento_de_oferta,extravio_definitivo,extravio_temporario,intervalo_extravio_temporario,violacao_furto_avaria,cancelamento/alteracao_destino,atraso,intervalo_atraso,culpa_exclusiva_consumidor,condicoes_climaticas/fechamento_aeroporto,noshow,overbooking,assistencia_cia_aerea,hipervulneravel",
         "sentenca,direito_de_arrependimento,descumprimento_de_oferta,extravio_definitivo,extravio_temporario,violacao_furto_avaria,cancelamento/alteracao_destino,atraso,noshow,overbooking,assistencia_cia_aerea,hipervulneravel,culpa_exclusiva_consumidor,condicoes_climaticas/fechamento_aeroporto,intervalo_extravio_temporario,intervalo_atraso"
      ], # conjuntos artigo
+    [
+        "sentenca,direito_de_arrependimento,descumprimento_de_oferta,extravio_definitivo,extravio_temporario,intervalo_extravio_temporario,violacao_furto_avaria,cancelamento/alteracao_destino,atraso,intervalo_atraso,culpa_exclusiva_consumidor,condicoes_climaticas/fechamento_aeroporto,noshow,overbooking,assistencia_cia_aerea,hipervulneravel",
+        "sentenca,direito_de_arrependimento,descumprimento_de_oferta,extravio_definitivo,extravio_temporario,violacao_furto_avaria,cancelamento/alteracao_destino,atraso,noshow,overbooking,assistencia_cia_aerea,hipervulneravel,culpa_exclusiva_consumidor,condicoes_climaticas/fechamento_aeroporto,intervalo_extravio_temporario,intervalo_atraso"
+     ], # conjuntos extravio1
     "sentenca,direito_de_arrependimento,descumprimento_de_oferta,extravio_definitivo,extravio_temporario,intervalo_extravio_temporario,violacao_furto_avaria,cancelamento/alteracao_destino,atraso,intervalo_atraso,culpa_exclusiva_consumidor,condicoes_climaticas/fechamento_aeroporto,noshow,overbooking,assistencia_cia_aerea,hipervulneravel", # original, artigo
     "sentenca,direito_de_arrependimento,descumprimento_de_oferta,extravio_definitivo,extravio_temporario,intervalo_extravio_temporario,violacao_furto_avaria,cancelamento/alteracao_destino,atraso,intervalo_atraso,culpa_exclusiva_consumidor,condicoes_climaticas/fechamento_aeroporto,noshow,overbooking,assistencia_cia_aerea,hipervulneravel", # original, extravio1
     ]

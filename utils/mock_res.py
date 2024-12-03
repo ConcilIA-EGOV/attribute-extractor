@@ -1,14 +1,14 @@
 mock_response = {
   "choices": [
-    {
-      "finish_reason": "stop",
-      "index": 0,
-      "message": {
-        "content": "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15\nS,S,N,S,48:00,S,N,S,4:00,S,N,N,N,N,N",
-        "role": "assistant"
-      },
-      "logprobs": "null"
-    },
+    # {
+    #   "finish_reason": "stop",
+    #   "index": 0,
+    #   "message": {
+    #     "content": "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15\nS,S,N,S,48:00,S,N,S,4:00,S,N,N,N,N,N",
+    #     "role": "assistant"
+    #   },
+    #   "logprobs": "null"
+    # },
     {
       "finish_reason": "stop",
       "index": 0,

@@ -47,7 +47,7 @@ def num_tokens_from_string(string: str, encoding_name="cl100k_base") -> int:
 
     return num_tokens
 
-id = 0
+id = -1
 def send_prompt(prompt:str, retries=1) -> tuple[str, str, int, int]:
     api_key = get_api_key()
     if len(api_key) == 0:
@@ -71,7 +71,7 @@ def send_prompt(prompt:str, retries=1) -> tuple[str, str, int, int]:
                     time.sleep(TIME_BETWEEN_REQUESTS)
             else:
                 global id
-                id = (id + 1) % 4
+                id = (id + 1) % 3
                 response = mock_response['choices'][id]
             break
         except Exception as e:

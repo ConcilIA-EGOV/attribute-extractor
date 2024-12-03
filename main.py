@@ -20,7 +20,7 @@ def reorder_results(current_header:list[str],
     Reorder the values to match the intended header.
     """
     if not (len(current_header) == len(values) == len(intended_header)):
-        raise Exception("The number of headers and values are different")
+        return values
     result = []
     for header in intended_header:
         index = current_header.index(header)
@@ -75,24 +75,19 @@ def apply_prompt_to_files(experiment, list_prompts, output_path):
                 for prompt in prompt_list:
                     full_prompt = merge_prompt_and_document(document_text, prompt)
 
-                    t1 = time.time()
                     log_response, result, input_tokens, output_tokens = send_prompt(full_prompt)
-                    t2 = time.time()
 
                     csv_block += ',' + result
                     # Somando quantidade de tokens utilizados
                     total_tokens += input_tokens + output_tokens
                     # Salvando response no arquivo de log
-                    log.write("Sentença " + sentenca[:-1] + ": ")
-                    log.write(f" Tempo da requisição --> {t2 - t1}\n")
+                    log.write("Sentença " + sentenca[:-1] + ":\n")
                     log.write(log_response + "\n\n")
                 if type(cabecalho) == list:
-                    print(csv_block)
                     csv_block = reorder_results(current_header=cabecalho[1].split(","),
                                                 intended_header=cabecalho[0].split(","),
                                                 values=csv_block.split(","))
                     csv_block = ",".join(csv_block) + "\n"
-                    print(csv_block)
                         
 
                 # Salvando Resultado
