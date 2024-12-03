@@ -39,7 +39,8 @@ def read_prompt(prompt_file, enc="utf-8"):
     # verifies if is a directory
     if os.path.isdir(prompt_file):
         # returns a list of files in the directory
-        return list_raw_files_in_folder(prompt_file)
+        prompt_list = list_raw_files_in_folder(prompt_file)
+        return [read_txt_file(p, enc) for p in prompt_list]
     return [read_txt_file(prompt_file, enc)]
 
 

@@ -81,7 +81,7 @@ def apply_prompt_to_files(experiment, list_prompts, output_path):
                     # Somando quantidade de tokens utilizados
                     total_tokens += input_tokens + output_tokens
                     # Salvando response no arquivo de log
-                    log.write("Sentença " + sentenca[:-1] + ":\n")
+                    log.write("Sentença " + sentenca + ":\n")
                     log.write(log_response + "\n\n")
                 if type(cabecalho) == list:
                     csv_block = reorder_results(current_header=cabecalho[1].split(","),
