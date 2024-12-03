@@ -5,6 +5,7 @@ all:
 	@echo "make clean_sentencas para limpar os arquivos de sentencas"
 
 run:
+	@rm -rf resultados_requisicao*
 	@python3 main.py
 
 clean:
@@ -16,3 +17,7 @@ clean_prompts:
 
 clean_sentencas:
 	@rm -rf data/sentencas/*/*.txt
+
+env:
+	@source bin/activate
+	@pip install -r requirements.txt

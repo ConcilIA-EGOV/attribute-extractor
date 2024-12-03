@@ -1,24 +1,32 @@
 """
 Call function to read file and call function to prompt
 """
-import os
 import time
 
 import tqdm
 
-from config import VERBOSE, CABECALHOS, SENTENCES_REPETITIONS
+from config import CABECALHOS, SENTENCES_REPETITIONS
 from config import PATH_RAW_DOCUMENTS_FOLDERS, PATH_PROMPTS, PATH_BASE_OUTPUT
 
-from src.api import send_prompt, get_api_key
-from src.file_operations import list_raw_files_in_folder, read_txt_file, get_set_of_files_path, \
-    get_list_of_prompts, get_results_path, get_log_path #, convert_csv_to_xlsx, get_formatted_results_path
+from src.api import send_prompt
+from src.file_operations import list_raw_files_in_folder, read_prompt, read_txt_file, merge_prompt_and_document
+from src.file_operations import get_list_of_prompts, get_results_path, get_log_path, get_set_of_files_path
 
 
-def merge_prompt_and_document(document_text, prompt):
+def reorder_results(current_header:list[str],
+                    intended_header:list[str],
+                    values:list[str]) -> list[str]:
     """
-    In this way, we are sure that we follow the same pattern all the time.
+    Reorder the values to match the intended header.
     """
-    return prompt + os.linesep + "[ " + document_text + " ]"
+    if not (len(current_header) == len(values) == len(intended_header)):
+        raise Exception("The number of headers and values are different")
+    result = []
+    for header in intended_header:
+        index = current_header.index(header)
+        result.append(values[index])
+    return result
+
 
 # Formata a resposta para ser salva no arquivo de resultados
 # como uma lista e obtém o número da sentença
@@ -28,30 +36,14 @@ def get_sentence(file_path:str) -> str:
     limite = arquivo.index('/')
     temp = arquivo[:limite]
     temp.reverse()
-    sentenca = "".join(temp) + ','
+    sentenca = "".join(temp)
     return sentenca
-
-
-# Pegando a linha com os resultados
-def find_results(response_for_db:list[str]) -> tuple[str, list]:
-    result_index = None
-    for i, row in enumerate(response_for_db):
-        row_elements = row.split(',')
-        if (any(el == "S" or el == "N" or el == '"S"' or el == '"N"' for el in row_elements)):
-            result_index = i
-            break
-    
-    if (result_index == None):
-        result_index = 0
-        response_for_db[result_index] = ""
-
-    return response_for_db[result_index] + "\n"
 
 
 def apply_prompt_to_files(experiment, list_prompts, output_path):    
     for p, prompt_path in enumerate(list_prompts):
         print("-" * 50)
-        prompt_text = read_txt_file(prompt_path)
+        prompt_list = read_prompt(prompt_path)
         print("Using prompt: ", prompt_path)
         target_files_paths = list_raw_files_in_folder(experiment)
 
@@ -62,7 +54,10 @@ def apply_prompt_to_files(experiment, list_prompts, output_path):
         results_path = get_results_path(target_files_paths, prompt_path, output_path)
         resultados = open(results_path, "w")
         cabecalho = CABECALHOS[p]
-        resultados.write(cabecalho)
+        if type(cabecalho) == list:
+            resultados.write(cabecalho[0] + '\n')
+        else:
+            resultados.write(cabecalho + '\n')
 
         # Abrindo arquivo com log das responses
         log_path = get_log_path(target_files_paths, prompt_path, output_path)
@@ -72,49 +67,36 @@ def apply_prompt_to_files(experiment, list_prompts, output_path):
 
         total_tokens = 0
         # teste = 0
-        for file_path in tqdm.tqdm(target_files_paths):            
+        for file_path in tqdm.tqdm(target_files_paths):
             try:
-                if VERBOSE:
-                    print("=" * 50)
-                    print(f"Reading file: {file_path}")
-
+                sentenca = get_sentence(file_path)
                 document_text = read_txt_file(file_path)
-                full_prompt = merge_prompt_and_document(document_text, prompt_text)
+                csv_block = sentenca
+                for prompt in prompt_list:
+                    full_prompt = merge_prompt_and_document(document_text, prompt)
 
-                if VERBOSE:
-                    print("Sending request to OpenAI")
+                    t1 = time.time()
+                    log_response, result, input_tokens, output_tokens = send_prompt(full_prompt)
+                    t2 = time.time()
 
-                t1 = time.time()
-                responses, input_tokens, output_tokens = send_prompt(full_prompt)
-                t2 = time.time()
-
-                # Extraindo resultado
-                # Somando quantidade de tokens utilizados
-                total_tokens += input_tokens + output_tokens
-                for response in responses:
-                    response = response.replace("```", "").strip()
-                    response_for_db = response.split('\n')
-                    sentenca = get_sentence(file_path)
-
+                    csv_block += ',' + result
+                    # Somando quantidade de tokens utilizados
+                    total_tokens += input_tokens + output_tokens
                     # Salvando response no arquivo de log
-                    log.write("Sentença " + sentenca[:-1] + ":\n")
-                    log.write(response + "\n\n")
+                    log.write("Sentença " + sentenca[:-1] + ": ")
+                    log.write(f" Tempo da requisição --> {t2 - t1}\n")
+                    log.write(log_response + "\n\n")
+                if type(cabecalho) == list:
+                    print(csv_block)
+                    csv_block = reorder_results(current_header=cabecalho[1].split(","),
+                                                intended_header=cabecalho[0].split(","),
+                                                values=csv_block.split(","))
+                    csv_block = ",".join(csv_block) + "\n"
+                    print(csv_block)
+                        
 
-                    # Pegando a linha com os resultados
-                    result = find_results(response_for_db)
-                    csv_block = sentenca + result
-
-                    # Salvando Resultado
-                    resultados.write(csv_block)
-
-                if VERBOSE:
-                    print("Response:")
-                    print("-" * 10)
-                    print(response.replace("```", "").strip())
-                    print("-" * 10)
-                    print(f"Response time: {round(t2 - t1, 3)} seconds")
-                    print(f"Input tokens: {input_tokens}")
-                    print(f"Output tokens: {output_tokens}")
+                # Salvando Resultado
+                resultados.write(csv_block)
             
                 # teste += 1
             except Exception as e:
@@ -122,9 +104,6 @@ def apply_prompt_to_files(experiment, list_prompts, output_path):
         log.write("Tokens utilizados no experimento: " + str(total_tokens)) 
         resultados.close()
         log.close()
-
-        if VERBOSE:
-            print("End of execution.")
 
 def run_all_experiments():
     list_set_of_experiments = get_set_of_files_path(base_path=PATH_RAW_DOCUMENTS_FOLDERS)

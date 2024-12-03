@@ -21,6 +21,23 @@ sys.path.append('../config.py')
 from config import API_ACCESS, TIME_BETWEEN_REQUESTS, MODEL, TEMPERATURE
 
 
+# Pegando a linha com os resultados
+def find_results(response_for_db:list[str]) -> str:
+    result_index = None
+    for i, row in enumerate(response_for_db):
+        row_elements = row.split(',')
+        if any((el in ["S","N",'"S"','"N"','-','null', ' ', ''] or (
+            len(el) in [5, 8] and ':' in el)) for el in row_elements):
+            result_index = i
+            break
+    
+    if (result_index == None):
+        result_index = 0
+        response_for_db = [",".join(response_for_db)]
+
+    return response_for_db[result_index]
+
+
 def num_tokens_from_string(string: str, encoding_name="cl100k_base") -> int:
     """Returns the number of tokens in a text string."""
     # Chamada:
@@ -30,8 +47,8 @@ def num_tokens_from_string(string: str, encoding_name="cl100k_base") -> int:
 
     return num_tokens
 
-
-def send_prompt(prompt:str, retries=1) -> tuple[list[str], int, int]:
+id = 0
+def send_prompt(prompt:str, retries=1) -> tuple[str, str, int, int]:
     api_key = get_api_key()
     if len(api_key) == 0:
         raise Exception("API Key is required.")
@@ -40,7 +57,6 @@ def send_prompt(prompt:str, retries=1) -> tuple[list[str], int, int]:
 
     # Set your OpenAI API key
     openai.api_key = api_key
-    request_repetitions = 1
 
     for retry in range(retries):
         try:
@@ -48,16 +64,15 @@ def send_prompt(prompt:str, retries=1) -> tuple[list[str], int, int]:
                 # Generate a response using the OpenAI API
                 response = openai.chat.completions.create(
                     model=MODEL,
-                    n=request_repetitions,
                     messages=[{"role": "user", "content": prompt}],
                     temperature=TEMPERATURE
                 )
                 if TIME_BETWEEN_REQUESTS:
-                    time.sleep(TIME_BETWEEN_REQUESTS)                
+                    time.sleep(TIME_BETWEEN_REQUESTS)
             else:
-                response = []
-                for _ in range(request_repetitions):
-                    response.append(mock_response['choices'][0])
+                global id
+                id = (id + 1) % 4
+                response = mock_response['choices'][id]
             break
         except Exception as e:
             response = None
@@ -70,18 +85,18 @@ def send_prompt(prompt:str, retries=1) -> tuple[list[str], int, int]:
 
     if API_ACCESS:
         # Extract and count tokens in the generated text from the API response
-        generated_responses_list = [choice.message.content.strip() for choice in response.choices]
+        log_response = response.choices[0].message.content.replace("```", "").strip()
         generated_tokens = response.usage.completion_tokens
         prompt_tokens = response.usage.prompt_tokens
     else:
         # Response simulada (para desenvolvimento), devido ao não acesso à API
-        generated_responses_list = [choice['message']['content'].strip() for choice in response]
+        log_response = response['message']['content'].replace("```", "").strip()
         prompt_tokens = num_tokens_from_string(prompt)
         generated_tokens = 0
-        for text in generated_responses_list:
+        for text in log_response:
             generated_tokens += num_tokens_from_string(text)
-
-    return generated_responses_list, prompt_tokens, generated_tokens
+    response = find_results(log_response.split('\n'))
+    return log_response, response, prompt_tokens, generated_tokens
 
 
 def get_api_key():

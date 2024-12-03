@@ -4,6 +4,12 @@ import os
 import glob
 import pandas as pd
 
+def merge_prompt_and_document(document_text, prompt):
+    """
+    In this way, we are sure that we follow the same pattern all the time.
+    """
+    return prompt + os.linesep + "[ " + document_text + " ]"
+
 def get_set_of_files_path(base_path):
     folders = [os.path.join(base_path, f) for f in os.listdir(base_path) if os.path.isdir(os.path.join(base_path, f))]
     if len(folders) > 0:
@@ -12,10 +18,10 @@ def get_set_of_files_path(base_path):
 
 
 def get_list_of_prompts(prompt_base_path, ext="txt"):
-    list_files = glob.glob(os.path.join(prompt_base_path, "*." + ext))
+    list_files = glob.glob(os.path.join(prompt_base_path, "*"))
     if list_files and len(list_files) > 0:
         return sorted(list_files)
-    raise Exception("No prompts found")
+    return []
 
 
 def list_raw_files_in_folder(path_to_folder, ext="txt"):
@@ -28,6 +34,13 @@ def list_raw_files_in_folder(path_to_folder, ext="txt"):
 
 def read_txt_file(target_file, enc="utf-8"):
     return open(target_file, "r", encoding=enc).read()
+
+def read_prompt(prompt_file, enc="utf-8"):
+    # verifies if is a directory
+    if os.path.isdir(prompt_file):
+        # returns a list of files in the directory
+        return list_raw_files_in_folder(prompt_file)
+    return [read_txt_file(prompt_file, enc)]
 
 
 def ensure_directory_exists(path):
@@ -87,7 +100,7 @@ def get_results_path(target_files_paths, prompt_path, PATH_BASE_OUTPUT):
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
 
-    results_path = os.path.join(dir_path, "resposta_gpt.csv")
+    results_path = os.path.join(dir_path, prompt_name + ".csv")
 
     return results_path
 
