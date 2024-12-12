@@ -5,7 +5,7 @@ import time
 
 import tqdm
 
-from config import CABECALHOS, SENTENCES_REPETITIONS
+from config import CABECALHOS, SENTENCES_REPETITIONS, TIME_BETWEEN_REQUESTS
 from config import PATH_RAW_DOCUMENTS_FOLDERS, PATH_PROMPTS, PATH_BASE_OUTPUT
 
 from src.api import send_prompt
@@ -69,23 +69,26 @@ def apply_prompt_to_files(experiment, list_prompts, output_path):
         log.write("Responses\n\n")
 
         total_tokens = 0
-        # teste = 0
         for file_path in tqdm.tqdm(target_files_paths):
             try:
                 sentenca = get_sentence(file_path)
                 document_text = read_txt_file(file_path)
                 csv_block = sentenca
-                for prompt in prompt_list:
+                log.write("Sentença " + sentenca + ":\n")
+                for req, prompt in enumerate(prompt_list):
                     full_prompt = merge_prompt_and_document(document_text, prompt)
 
+                    start = time.time()
                     log_response, result, input_tokens, output_tokens = send_prompt(full_prompt)
+                    delay = time.time() - start
 
                     csv_block += ',' + result
                     # Somando quantidade de tokens utilizados
                     total_tokens += input_tokens + output_tokens
                     # Salvando response no arquivo de log
-                    log.write("Sentença " + sentenca + ":\n")
-                    log.write(log_response + "\n\n")
+                    log.write(f'Req {req}: {delay} segundos\n' + log_response + "\n\n")
+                    if TIME_BETWEEN_REQUESTS:
+                        time.sleep(TIME_BETWEEN_REQUESTS)
                 if type(cabecalho) == list:
                     csv_block = reorder_results(current_header=cabecalho[1].split(","),
                                                 intended_header=cabecalho[0].split(","),
@@ -95,8 +98,7 @@ def apply_prompt_to_files(experiment, list_prompts, output_path):
 
                 # Salvando Resultado
                 resultados.write(csv_block)
-            
-                # teste += 1
+                
             except Exception as e:
                 print("Erro em apply_prompt_to_files:", e)
         log.write("Tokens utilizados no experimento: " + str(total_tokens)) 

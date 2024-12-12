@@ -4,6 +4,8 @@ TIME_BETWEEN_REQUESTS = 5
 # Faz com que a aplicação acesse a API da OpenAI. Caso esteja desabilitado,
 # utiliza uma mock response (para fins de desenvolvimento)
 API_ACCESS = True
+if not API_ACCESS:
+    TIME_BETWEEN_REQUESTS = 0
 
 # repetiç]oes dos experimentos
 SENTENCES_REPETITIONS = 3

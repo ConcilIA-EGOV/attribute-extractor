@@ -11,14 +11,13 @@ Parametros
 """
 from utils.mock_res import mock_response
 import os
-import time
 
 import openai
 import tiktoken
 import sys
 from dotenv import load_dotenv
 sys.path.append('../config.py')
-from config import API_ACCESS, TIME_BETWEEN_REQUESTS, MODEL, TEMPERATURE
+from config import API_ACCESS, MODEL, TEMPERATURE
 
 
 # Pegando a linha com os resultados
@@ -67,8 +66,6 @@ def send_prompt(prompt:str, retries=1) -> tuple[str, str, int, int]:
                     messages=[{"role": "user", "content": prompt}],
                     temperature=TEMPERATURE
                 )
-                if TIME_BETWEEN_REQUESTS:
-                    time.sleep(TIME_BETWEEN_REQUESTS)
             else:
                 global id
                 id = (id + 1) % 3
