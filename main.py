@@ -9,26 +9,9 @@ from config import CABECALHOS, SENTENCES_REPETITIONS, TIME_BETWEEN_REQUESTS
 from config import PATH_RAW_DOCUMENTS_FOLDERS, PATH_PROMPTS, PATH_BASE_OUTPUT
 
 from src.api import send_prompt
+from src.log_recycler import reorder_results
 from src.file_operations import list_raw_files_in_folder, read_prompt, read_txt_file, merge_prompt_and_document
 from src.file_operations import get_list_of_prompts, get_results_path, get_log_path, get_set_of_files_path
-
-
-def reorder_results(current_header:list[str],
-                    intended_header:list[str],
-                    values:list[str]) -> list[str]:
-    """
-    Reorder the values to match the intended header.
-    """
-    if not (len(current_header) == len(values) == len(intended_header)):
-        limit = len(intended_header)
-        if len(values) < limit:
-            limit = len(values)
-        return values[:limit]
-    result = []
-    for header in intended_header:
-        index = current_header.index(header)
-        result.append(values[index])
-    return result
 
 
 # Formata a resposta para ser salva no arquivo de resultados
