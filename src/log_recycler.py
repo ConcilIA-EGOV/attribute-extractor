@@ -42,6 +42,11 @@ def recycle(file: str, output_path: str, cabecalho):
     content = read_txt_file(file)
     cases = content.split('\n\nSentença ')
     cases.pop(0) # removendo linha 'Responses'
+    last = cases[-1] # removendo linha 'Tokens utilizados no experimento: x'
+    print(f'Last: {last}')
+    cases[-1] = "\n".join(last.split()[:-5])
+    print(f'Last: {cases[-1]}')
+    cases += ['END']
     for case in cases:
         lines = case.split('\n')
         sentence = lines[0].replace(':', '')
@@ -52,6 +57,7 @@ def recycle(file: str, output_path: str, cabecalho):
             sentence_prev = sentence
             print('FIRST:', sentence, '->', lines, '-->', csv_block)
         if sentence != sentence_prev:
+            print(f">> Sentence changed from {sentence_prev} to {sentence}")
             if type(cabecalho) == list:
                 csv_block = reorder_results(current_header=cabecalho[1].split(","),
                                             intended_header=cabecalho[0].split(","),
@@ -64,6 +70,7 @@ def recycle(file: str, output_path: str, cabecalho):
             sentence_prev = sentence
         csv_block += ',' + ",".join(lines)
         print(sentence, '->', lines, '-->', csv_block)
+    
 
 
 def recycler(base_path: str, cabecalho: list, ext='csv'):
