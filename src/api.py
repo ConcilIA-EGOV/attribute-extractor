@@ -48,24 +48,18 @@ def num_tokens_from_string(string: str, encoding_name="cl100k_base") -> int:
 
 id = -1
 def send_prompt(prompt:str, retries=1) -> tuple[str, str, int, int]:
-    api_key = get_api_key()
-    if len(api_key) == 0:
-        raise Exception("API Key is required.")
+    """
+    Sends a prompt to the API stated in config and returns the response.
+    """
     if len(prompt) == 0:
         raise Exception("Prompt is empty.")
-
-    # Set your OpenAI API key
-    openai.api_key = api_key
+    set_api_key()
 
     for retry in range(retries):
         try:
             if API_ACCESS:
-                # Generate a response using the OpenAI API
-                response = openai.chat.completions.create(
-                    model=MODEL,
-                    messages=[{"role": "user", "content": prompt}],
-                    temperature=TEMPERATURE
-                )
+                # Generate a response using the API
+                response = get_api_response(prompt)
             else:
                 global id
                 id = (id + 1) % 3
@@ -73,12 +67,12 @@ def send_prompt(prompt:str, retries=1) -> tuple[str, str, int, int]:
             break
         except Exception as e:
             response = None
-            print("Error while sending request to OpenAI: ", e)
+            print("Error while sending request to API: ", e)
             # print("Trying again in 1 minute")
             # time.sleep(60)
 
     if response is None:
-        raise Exception("OpenAI did not respond.")
+        raise Exception("API did not respond.")
 
     if API_ACCESS:
         # Extract and count tokens in the generated text from the API response
@@ -96,10 +90,30 @@ def send_prompt(prompt:str, retries=1) -> tuple[str, str, int, int]:
     return log_response, response, prompt_tokens, generated_tokens
 
 
-def get_api_key():
+def set_api_key():
+    """
+    Access the API key using the key name from the .env file
+    And sets it
+    """
     load_dotenv()
-    # Access the API key using the key name from the .env file
-    return os.getenv("OPENAI_API_KEY")
+    api_key = os.getenv("OPENAI_API_KEY")
+
+    if len(api_key) == 0:
+        raise Exception("API Key is required.")
+
+    # Set your API key
+    openai.api_key = api_key
+
+
+def get_api_response(prompt:str) -> str:
+    """
+    Sends a prompt to the API and returns the response.
+    """
+    return openai.chat.completions.create(
+                    model=MODEL,
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=TEMPERATURE
+                )
 
 
 def main():
@@ -110,7 +124,7 @@ def main():
     while True:
         # Example usage:
         prompt_example = input("\n\nInsira o prompt: ")
-        api_key_openai = get_api_key()
+        api_key_openai = set_api_key()
 
         response_example, prompt_tokens, output_tokens = send_prompt(prompt_example, api_key_openai)
 

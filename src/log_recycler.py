@@ -1,32 +1,8 @@
 import os
-from file_operations import list_raw_files_in_folder, get_set_of_files_path, read_txt_file, ensure_directory_exists
 import sys
 sys.path.append('../config.py')
-# from config import CABECALHOS
-CABECALHOS = [
-    [
-        "sentenca,direito_de_arrependimento,descumprimento_de_oferta,extravio_definitivo,extravio_temporario,intervalo_extravio_temporario,violacao_furto_avaria,cancelamento/alteracao_destino,atraso,intervalo_atraso,culpa_exclusiva_consumidor,condicoes_climaticas/fechamento_aeroporto,noshow,overbooking,assistencia_cia_aerea,hipervulneravel",
-        "sentenca,direito_de_arrependimento,descumprimento_de_oferta,extravio_definitivo,extravio_temporario,violacao_furto_avaria,cancelamento/alteracao_destino,atraso,noshow,overbooking,assistencia_cia_aerea,hipervulneravel,culpa_exclusiva_consumidor,condicoes_climaticas/fechamento_aeroporto,intervalo_extravio_temporario,intervalo_atraso"
-     ],
-    ""
-]
-
-def reorder_results(current_header:list[str],
-                    intended_header:list[str],
-                    values:list[str]) -> list[str]:
-    """
-    Reorder the values to match the intended header.
-    """
-    if not (len(current_header) == len(values) == len(intended_header)):
-        limit = len(intended_header)
-        if len(values) < limit:
-            limit = len(values)
-        return values[:limit]
-    result = []
-    for header in intended_header:
-        index = current_header.index(header)
-        result.append(values[index])
-    return result
+from file_operations import list_raw_files_in_folder, get_set_of_files_path, read_txt_file, ensure_directory_exists, reorder_results
+from config import CABECALHOS
 
 
 def recycle(file: str, output_path: str, cabecalho):

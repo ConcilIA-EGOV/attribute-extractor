@@ -21,14 +21,14 @@ Put the OpenAI API token in the `.env` file in the root folder:
 OPENAI_API_KEY=00000000000
 ``
 
-
 ## Usage
 
-To run the project, run:
+To run the diferents funcionalities of project, run:
 
 ``
-python main.py
+make
 ``
+It will show all the diferent running option
 
 ## Data
 
@@ -45,11 +45,6 @@ The prompts files should be placed in this directory `data/prompts`
 
 The outputs generated for each prompt will be automatically saved here.
 
-
-## Source Code
-
-
-
 ### api.py
 
 API calls to the OpenAI API
@@ -58,11 +53,9 @@ API calls to the OpenAI API
 
 Overview of the I/O operations on files provided by `file_operations.py`.
 
-
 ## Acknowledgments
 
 Give credit to individuals or projects that inspired or contributed to your project.
 
-
-
+## Source Code
 

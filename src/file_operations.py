@@ -4,30 +4,64 @@ import os
 import glob
 import pandas as pd
 
+def reorder_results(current_header:list[str],
+                    intended_header:list[str],
+                    values:list[str]) -> list[str]:
+    """
+    Reorder the values to match the intended header.
+    """
+    if not (len(current_header) == len(values) == len(intended_header)):
+        limit = len(intended_header)
+        if len(values) < limit:
+            limit = len(values)
+        return values[:limit]
+    result = []
+    for header in intended_header:
+        index = current_header.index(header)
+        result.append(values[index])
+    return result
+
 def merge_prompt_and_document(document_text, prompt):
     """
-    In this way, we are sure that we follow the same pattern all the time.
+    combine the prompt and the document text in a fixed way
     """
+    # In this way, we are sure that we follow the same pattern all the time.
     return prompt + os.linesep + "[ " + document_text + " ]"
 
+
 def get_set_of_files_path(base_path):
-    folders = [os.path.join(base_path, f) for f in os.listdir(base_path) if os.path.isdir(os.path.join(base_path, f))]
+    '''
+    return a folder list
+    '''
+    folders = [os.path.join(base_path,f)
+               for f in os.listdir(base_path)
+                if os.path.isdir(
+                    os.path.join(base_path, f))]
     if len(folders) > 0:
+        # It's important to sort the folders for output consistency
         return sorted(folders)
     raise Exception("No experiments found")
 
 
-def get_list_of_prompts(prompt_base_path, ext="txt"):
+def get_list_of_prompts(prompt_base_path):
+    """
+    List all files in the prompt folder
+    """
     list_files = glob.glob(os.path.join(prompt_base_path, "*"))
     if list_files and len(list_files) > 0:
+        # It's important to sort the files for output consistency
         return sorted(list_files)
     return []
 
 
 def list_raw_files_in_folder(path_to_folder, ext="txt"):
-    # List files
+    """
+    List all files in the folder with a specific extension,
+    default is txt
+    """
     list_files_paths = glob.glob(os.path.join(path_to_folder, "*." + ext))
     if list_files_paths and len(list_files_paths):
+        # It's important to sort the files for output consistency
         return sorted(list_files_paths)
     raise Exception("No raw files found")
 
@@ -36,6 +70,9 @@ def read_txt_file(target_file, enc="utf-8"):
     return open(target_file, "r", encoding=enc).read()
 
 def read_prompt(prompt_file, enc="utf-8"):
+    """
+    Read the prompt file path and return a list of prompts
+    """
     # verifies if is a directory
     if os.path.isdir(prompt_file):
         # returns a list of files in the directory
@@ -104,6 +141,23 @@ def get_results_path(target_files_paths, prompt_path, PATH_BASE_OUTPUT):
     results_path = os.path.join(dir_path, prompt_name + ".csv")
 
     return results_path
+
+def get_sentence(file_path:str) -> str:
+    """
+    Get the sentence number from the file path
+    """
+    # file path until the '.txt'
+    arquivo = list(file_path[:-4])
+    arquivo.reverse()
+    # limit is the index of the last (originally) '/'
+    limite = arquivo.index('/')
+    # the sentence number is the string between the last '/' and the '.'
+    # (the file name)
+    temp = arquivo[:limite]
+    temp.reverse()
+    sentenca = "".join(temp)
+    return sentenca
+
 
 def get_log_path(target_files_paths, prompt_path, PATH_LOG):
     """

@@ -9,24 +9,17 @@ from config import CABECALHOS, SENTENCES_REPETITIONS, TIME_BETWEEN_REQUESTS
 from config import PATH_RAW_DOCUMENTS_FOLDERS, PATH_PROMPTS, PATH_BASE_OUTPUT
 
 from src.api import send_prompt
-from src.log_recycler import reorder_results
-from src.file_operations import list_raw_files_in_folder, read_prompt, read_txt_file, merge_prompt_and_document
-from src.file_operations import get_list_of_prompts, get_results_path, get_log_path, get_set_of_files_path
+from src.file_operations import reorder_results
+from src.file_operations import list_raw_files_in_folder, read_prompt, read_txt_file
+from src.file_operations import get_list_of_prompts, get_results_path, get_log_path
+from src.file_operations import get_sentence, merge_prompt_and_document, get_set_of_files_path
 
 
-# Formata a resposta para ser salva no arquivo de resultados
-# como uma lista e obtém o número da sentença
-def get_sentence(file_path:str) -> str:
-    arquivo = list(file_path[:-4])
-    arquivo.reverse()
-    limite = arquivo.index('/')
-    temp = arquivo[:limite]
-    temp.reverse()
-    sentenca = "".join(temp)
-    return sentenca
-
-
-def apply_prompt_to_files(experiment, list_prompts, output_path):    
+def apply_prompt_to_files(experiment, list_prompts, output_path):
+    """
+    Add the prompt to each file in the experiment folder
+    Sends the api request and stores the results.
+    """
     for p, prompt_path in enumerate(list_prompts):
         print("-" * 50)
         prompt_list = read_prompt(prompt_path)
@@ -41,6 +34,8 @@ def apply_prompt_to_files(experiment, list_prompts, output_path):
         resultados = open(results_path, "w")
         cabecalho = CABECALHOS[p]
         if type(cabecalho) == list:
+            # if it's a group experiment,
+            # write the final header on the results file
             resultados.write(cabecalho[0] + '\n')
         else:
             resultados.write(cabecalho + '\n')
@@ -54,10 +49,10 @@ def apply_prompt_to_files(experiment, list_prompts, output_path):
         total_tokens = 0
         for file_path in tqdm.tqdm(target_files_paths):
             try:
-                sentenca = get_sentence(file_path)
                 document_text = read_txt_file(file_path)
-                csv_block = sentenca
+                sentenca = get_sentence(file_path)
                 log.write("Sentença " + sentenca + ":\n")
+                csv_block = sentenca
                 for req, prompt in enumerate(prompt_list):
                     full_prompt = merge_prompt_and_document(document_text, prompt)
 
@@ -89,13 +84,13 @@ def apply_prompt_to_files(experiment, list_prompts, output_path):
         log.close()
 
 def run_all_experiments():
+    # The experiments are the individual folders with raw txt files.
     list_set_of_experiments = get_set_of_files_path(base_path=PATH_RAW_DOCUMENTS_FOLDERS)
     
     path_prompt = PATH_PROMPTS
     
     list_prompts = get_list_of_prompts(prompt_base_path=path_prompt)
     
-    # The experiments are the individual folders with raw txt files.
     for i in range(SENTENCES_REPETITIONS):
         for experiment in list_set_of_experiments:
             print("=" * 50)
